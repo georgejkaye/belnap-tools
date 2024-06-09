@@ -1,8 +1,11 @@
-let concatStrings = (ss, ~delim=", ") =>
+let concatAsStrings = (ss, ~delim=", ", fn) =>
   Array.reduce(ss, "", (acc, cur) => {
+    let curString = fn(cur)
     if acc === "" {
-      cur
+      curString
     } else {
-      `${acc}${delim}${cur}`
+      `${acc}${delim}${curString}`
     }
   })
+
+let concatStrings = (ss, ~delim=", ") => concatAsStrings(ss, ~delim, s => s)

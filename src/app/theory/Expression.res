@@ -18,7 +18,7 @@ let rec enumerate_inputs = m =>
     Array.reduce(all_values, [], (acc, v) => Array.concat(acc, Array.map(subs, vs => [v, ...vs])))
   }
 
-let string_of_value_array = vs => Utils.concatStrings(Array.map(vs, string_of_value), ~delim=" ")
+let string_of_value_array = vs => Utils.concatAsStrings(vs, ~delim=" ", string_of_value)
 
 type rec expression =
   | Variable(int)

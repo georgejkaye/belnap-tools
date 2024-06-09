@@ -41,7 +41,7 @@ function enumerate_inputs(m) {
 }
 
 function string_of_value_array(vs) {
-  return Utils.concatStrings(vs.map(string_of_value), " ");
+  return Utils.concatAsStrings(vs, " ", string_of_value);
 }
 
 function string_of_expression(exp) {
