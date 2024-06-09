@@ -4,7 +4,7 @@ module Navigation = {
   @react.component
   let make = () =>
     <nav className="p-2 h-12 flex border-b border-gray-200 justify-between items-center text-sm">
-      <Link href="/">
+      <Link className="flex" href="/">
         <img className="w-5" src="/static/zeit-black-triangle.svg" />
         <span className="text-xl ml-2 align-middle font-semibold">
           {React.string("Next")}

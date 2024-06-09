@@ -23,7 +23,8 @@ function MainLayout$Navigation(props) {
                               ],
                               className: "text-xl ml-2 align-middle font-semibold"
                             })
-                      ]
+                      ],
+                      className: "flex"
                     }),
                 JsxRuntime.jsxs("div", {
                       children: [
