@@ -1,7 +1,7 @@
 {
   "name": "belnap-tools",
   "sources": {
-    "dir": "src/app",
+    "dir": "src",
     "subdirs": true
   },
   "jsx": {
