@@ -1,22 +1,30 @@
 {
   "name": "belnap-tools",
   "version": "0.1.0",
-  "private": true,
+  "license": "GPL-3.0-or-later",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "res:build": "rescript",
+    "res:clean": "rescript clean",
+    "res:dev": "rescript -w"
   },
   "dependencies": {
+    "@rescript/core": "1.4.0",
+    "@rescript/react": "^0.12.2",
+    "autoprefixer": "^10.4.19",
+    "next": "14.2.3",
+    "next-transpile-modules": "^10.0.1",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.3"
+    "rescript": "11.1.1"
   },
   "devDependencies": {
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
     "eslint": "^8",
-    "eslint-config-next": "14.2.3"
+    "eslint-config-next": "14.2.3",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1"
   }
 }

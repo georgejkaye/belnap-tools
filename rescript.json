@@ -1,0 +1,23 @@
+{
+  "name": "belnap-tools",
+  "sources": {
+    "dir": "src/app",
+    "subdirs": true
+  },
+  "jsx": {
+    "version": 4,
+    "mode": "automatic"
+  },
+  "package-specs": {
+    "module": "esmodule",
+    "in-source": true
+  },
+  "suffix": ".res.mjs",
+  "bs-dependencies": [
+    "@rescript/core",
+    "@rescript/react"
+  ],
+  "bsc-flags": [
+    "-open RescriptCore"
+  ]
+}
