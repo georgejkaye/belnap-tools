@@ -13,8 +13,8 @@ let default = () =>
     <h2 className="text-2xl font-semibold mt-5"> {React.string("Quick Start")} </h2>
     <div>
       <div>
-        {MoreReact.map(Expression.enumerate_inputs(3), vs =>
-          <div> {Expression.string_of_value_array(vs)->React.string} </div>
+        {MoreReact.mapi(Expression.strings_of_table(Belnap.test_fn, 2, 1), (str, i) =>
+          <div className="font-mono"> {str->React.string} </div>
         )}
       </div>
     </div>
