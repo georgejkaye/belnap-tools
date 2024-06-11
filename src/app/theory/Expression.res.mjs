@@ -16,13 +16,60 @@ function string_of_expression(exp) {
         return "(" + string_of_expression(exp._0) + " ∧ " + string_of_expression(exp._1) + ")";
     case "Or" :
         return "(" + string_of_expression(exp._0) + " ∨ " + string_of_expression(exp._1) + ")";
+    case "Join" :
+        return "(" + string_of_expression(exp._0) + " ⊔ " + string_of_expression(exp._1) + ")";
     case "Not" :
         return "¬" + string_of_expression(exp._0);
     
   }
 }
 
-function function_to_rows(fn, m) {
+function substitute(subs, exp) {
+  switch (exp.TAG) {
+    case "Variable" :
+        var i = exp._0;
+        var sub = subs.get(i);
+        if (sub !== undefined) {
+          return sub;
+        } else {
+          return {
+                  TAG: "Variable",
+                  _0: i
+                };
+        }
+    case "Constant" :
+        return {
+                TAG: "Constant",
+                _0: exp._0
+              };
+    case "And" :
+        return {
+                TAG: "And",
+                _0: substitute(subs, exp._0),
+                _1: substitute(subs, exp._1)
+              };
+    case "Or" :
+        return {
+                TAG: "Or",
+                _0: substitute(subs, exp._0),
+                _1: substitute(subs, exp._1)
+              };
+    case "Join" :
+        return {
+                TAG: "Join",
+                _0: substitute(subs, exp._0),
+                _1: substitute(subs, exp._1)
+              };
+    case "Not" :
+        return {
+                TAG: "Not",
+                _0: substitute(subs, exp._0)
+              };
+    
+  }
+}
+
+function rows_of_function(fn, m) {
   var input_values = Belnap.enumerate_inputs(m);
   return Core__Array.reduce(input_values, [], (function (acc, vs) {
                 var ws = fn(vs);
@@ -40,6 +87,48 @@ function function_to_rows(fn, m) {
               }));
 }
 
+function explode_row(exploder, left_bit, param) {
+  var exploded_inputs = Core__Array.reduce(param[0], [], (function (acc, cur) {
+          var match = exploder(cur);
+          return Belt_Array.concatMany([
+                      acc,
+                      [
+                        match[0],
+                        match[1]
+                      ]
+                    ]);
+        }));
+  var exploded_outputs = Core__Array.reduce(param[1], [], (function (acc, cur) {
+          var match = exploder(cur);
+          var chosen = left_bit ? match[0] : match[1];
+          return Belt_Array.concatMany([
+                      acc,
+                      [chosen]
+                    ]);
+        }));
+  return [
+          exploded_inputs,
+          exploded_outputs
+        ];
+}
+
+function explode_rows(exploder, left, rows) {
+  return Core__Array.reduce(rows, [], (function (acc, row) {
+                return Belt_Array.concatMany([
+                            acc,
+                            [explode_row(exploder, left, row)]
+                          ]);
+              }));
+}
+
+function truthy_explode_rows(extra) {
+  return explode_rows(Belnap.truthy_of_value, false, extra);
+}
+
+function falsy_explode_rows(extra) {
+  return explode_rows(Belnap.falsy_of_value, true, extra);
+}
+
 function string_of_row(param) {
   var string_of_cells = function (elements) {
     return Utils.concatAsStrings(elements, " ", Belnap.string_of_value);
@@ -49,13 +138,21 @@ function string_of_row(param) {
   return inputString + " | " + outputString;
 }
 
-function string_of_table(fn, m, n) {
-  var rows = function_to_rows(fn, m);
+function string_of_table(rows) {
   return Utils.concatAsStrings(rows, "\n", string_of_row);
 }
 
-function strings_of_table(fn, m, n) {
-  var rows = function_to_rows(fn, m);
+function strings_of_table(rows) {
+  return rows.map(string_of_row);
+}
+
+function string_of_function_table(fn, m, n) {
+  var rows = rows_of_function(fn, m);
+  return string_of_table(rows);
+}
+
+function strings_of_function_table(fn, m, n) {
+  var rows = rows_of_function(fn, m);
   return rows.map(string_of_row);
 }
 
@@ -124,38 +221,136 @@ function get_falsy_dnf(extra, extra$1) {
               }), extra, extra$1);
 }
 
-var test_exp = {
-  TAG: "And",
-  _0: {
-    TAG: "Or",
-    _0: {
-      TAG: "Variable",
-      _0: 2
-    },
-    _1: {
-      TAG: "Constant",
-      _0: "False"
-    }
-  },
-  _1: {
-    TAG: "Variable",
-    _0: 1
-  }
-};
+function get_subs(left_translator, right_translator, m) {
+  return new Map(Core__Array.fromInitializer((m << 1), (function (i) {
+                    if (i % 2 === 0) {
+                      return [
+                              i,
+                              left_translator(i)
+                            ];
+                    } else {
+                      return [
+                              i,
+                              right_translator(i)
+                            ];
+                    }
+                  })));
+}
 
-var expression_of_function;
+function expressions_of_function(fn, m, n) {
+  var table = rows_of_function(fn, m);
+  var falsy_table = explode_rows(Belnap.falsy_of_value, true, table);
+  var truthy_table = explode_rows(Belnap.truthy_of_value, false, table);
+  var falsy_subs = get_subs((function (i) {
+          return {
+                  TAG: "And",
+                  _0: {
+                    TAG: "Constant",
+                    _0: "Bottom"
+                  },
+                  _1: {
+                    TAG: "Variable",
+                    _0: i
+                  }
+                };
+        }), (function (i) {
+          return {
+                  TAG: "Not",
+                  _0: {
+                    TAG: "Or",
+                    _0: {
+                      TAG: "Constant",
+                      _0: "Bottom"
+                    },
+                    _1: {
+                      TAG: "Variable",
+                      _0: i
+                    }
+                  }
+                };
+        }), m);
+  var truthy_subs = get_subs((function (i) {
+          return {
+                  TAG: "Not",
+                  _0: {
+                    TAG: "And",
+                    _0: {
+                      TAG: "Constant",
+                      _0: "Bottom"
+                    },
+                    _1: {
+                      TAG: "Variable",
+                      _0: i
+                    }
+                  }
+                };
+        }), (function (i) {
+          return {
+                  TAG: "Or",
+                  _0: {
+                    TAG: "Constant",
+                    _0: "Bottom"
+                  },
+                  _1: {
+                    TAG: "Variable",
+                    _0: i
+                  }
+                };
+        }), m);
+  var expressions = Core__Array.fromInitializer(n, (function (i) {
+          var falsy_exp = substitute(falsy_subs, get_falsy_dnf(i, falsy_table));
+          var truthy_exp = substitute(truthy_subs, get_truthy_dnf(i, truthy_table));
+          return {
+                  TAG: "Join",
+                  _0: falsy_exp,
+                  _1: truthy_exp
+                };
+        }));
+  return [
+          table,
+          falsy_table,
+          truthy_table,
+          expressions
+        ];
+}
+
+var match = expressions_of_function((function (vs) {
+        return [Belnap.not_fn(vs[0])];
+      }), 1, 1);
+
+var test_exps = match[3];
+
+var test_exp = test_exps[0];
+
+var test_table = match[0];
+
+var test_falsy_table = match[1];
+
+var test_truthy_table = match[2];
 
 export {
-  test_exp ,
   string_of_expression ,
-  function_to_rows ,
+  substitute ,
+  rows_of_function ,
+  explode_row ,
+  explode_rows ,
+  truthy_explode_rows ,
+  falsy_explode_rows ,
   string_of_row ,
   string_of_table ,
   strings_of_table ,
+  string_of_function_table ,
+  strings_of_function_table ,
   get_conj ,
   get_dnf ,
   get_truthy_dnf ,
   get_falsy_dnf ,
-  expression_of_function ,
+  get_subs ,
+  expressions_of_function ,
+  test_table ,
+  test_falsy_table ,
+  test_truthy_table ,
+  test_exps ,
+  test_exp ,
 }
-/* No side effect */
+/* match Not a pure module */

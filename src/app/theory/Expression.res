@@ -3,6 +3,7 @@ type rec expression =
   | Constant(Belnap.value)
   | And(expression, expression)
   | Or(expression, expression)
+  | Join(expression, expression)
   | Not(expression)
 
 let test_exp = And(Or(Variable(2), Constant(False)), Variable(1))
@@ -13,10 +14,25 @@ let rec string_of_expression = exp =>
   | Constant(v) => Belnap.string_of_value(v)
   | And(e1, e2) => `(${string_of_expression(e1)} ∧ ${string_of_expression(e2)})`
   | Or(e1, e2) => `(${string_of_expression(e1)} ∨ ${string_of_expression(e2)})`
+  | Join(e1, e2) => `(${string_of_expression(e1)} ⊔ ${string_of_expression(e2)})`
   | Not(e) => `¬${string_of_expression(e)}`
   }
 
-let function_to_rows = (fn, m) => {
+let rec substitute = (subs, exp) =>
+  switch exp {
+  | Variable(i) =>
+    switch Map.get(subs, i) {
+    | None => Variable(i)
+    | Some(sub) => sub
+    }
+  | Constant(v) => Constant(v)
+  | And(e1, e2) => And(substitute(subs, e1), substitute(subs, e2))
+  | Or(e1, e2) => Or(substitute(subs, e1), substitute(subs, e2))
+  | Join(e1, e2) => Join(substitute(subs, e1), substitute(subs, e2))
+  | Not(e) => Not(substitute(subs, e))
+  }
+
+let rows_of_function = (fn, m) => {
   let input_values = Belnap.enumerate_inputs(m)
   Array.reduce(input_values, [], (acc, vs) => {
     switch fn(vs) {
@@ -26,6 +42,32 @@ let function_to_rows = (fn, m) => {
   })
 }
 
+let explode_row = (exploder, left_bit, (inputs, outputs)) => {
+  let exploded_inputs = Array.reduce(inputs, [], (acc, cur) => {
+    let (left, right) = exploder(cur)
+    [...acc, left, right]
+  })
+  let exploded_outputs = Array.reduce(outputs, [], (acc, cur) => {
+    let (left, right) = exploder(cur)
+    let chosen = if left_bit {
+      left
+    } else {
+      right
+    }
+    [...acc, chosen]
+  })
+  (exploded_inputs, exploded_outputs)
+}
+
+let explode_rows = (exploder, left, rows) => {
+  Array.reduce(rows, [], (acc, row) => {
+    [...acc, explode_row(exploder, left, row)]
+  })
+}
+
+let truthy_explode_rows = explode_rows(Belnap.truthy_of_value, false, ...)
+let falsy_explode_rows = explode_rows(Belnap.falsy_of_value, true, ...)
+
 let string_of_row = ((inputs, outputs)) => {
   let string_of_cells = elements =>
     Utils.concatAsStrings(elements, ~delim=" ", Belnap.string_of_value)
@@ -34,14 +76,17 @@ let string_of_row = ((inputs, outputs)) => {
   `${inputString} | ${outputString}`
 }
 
-let string_of_table = (fn, m, n) => {
-  let rows = function_to_rows(fn, m)
-  Utils.concatAsStrings(rows, ~delim="\n", string_of_row)
+let string_of_table = rows => Utils.concatAsStrings(rows, ~delim="\n", string_of_row)
+let strings_of_table = rows => Array.map(rows, string_of_row)
+
+let string_of_function_table = (fn, m, n) => {
+  let rows = rows_of_function(fn, m)
+  string_of_table(rows)
 }
 
-let strings_of_table = (fn, m, n) => {
-  let rows = function_to_rows(fn, m)
-  Array.map(rows, string_of_row)
+let strings_of_function_table = (fn, m, n) => {
+  let rows = rows_of_function(fn, m)
+  strings_of_table(rows)
 }
 
 let get_conj = (col_unit, high_value, get_col_op, inputs) =>
@@ -100,4 +145,43 @@ let get_falsy_dnf =
     ...
   )
 
-let expression_of_function = None
+let get_subs = (left_translator, right_translator, m) =>
+  Map.fromArray(
+    Array.fromInitializer(~length=m * 2, i => {
+      if mod(i, 2) == 0 {
+        (i, left_translator(i))
+      } else {
+        (i, right_translator(i))
+      }
+    }),
+  )
+
+let expressions_of_function = (fn, m, n) => {
+  let table = rows_of_function(fn, m)
+  let falsy_table = falsy_explode_rows(table)
+  let truthy_table = truthy_explode_rows(table)
+  let falsy_subs = get_subs(
+    i => And(Constant(Bottom), Variable(i)),
+    i => Not(Or(Constant(Bottom), Variable(i))),
+    m,
+  )
+  let truthy_subs = get_subs(
+    i => Not(And(Constant(Bottom), Variable(i))),
+    i => Or(Constant(Bottom), Variable(i)),
+    m,
+  )
+  let expressions = Array.fromInitializer(~length=n, i => {
+    let falsy_exp = substitute(falsy_subs, get_falsy_dnf(i, falsy_table))
+    let truthy_exp = substitute(truthy_subs, get_truthy_dnf(i, truthy_table))
+    Join(falsy_exp, truthy_exp)
+  })
+  (table, falsy_table, truthy_table, expressions)
+}
+
+let (
+  test_table,
+  test_falsy_table,
+  test_truthy_table,
+  test_exps,
+) = expressions_of_function(vs => Some([Belnap.not_fn(Array.getUnsafe(vs, 0))]), 1, 1)
+let test_exp = Array.getUnsafe(test_exps, 0)

@@ -11,11 +11,24 @@ let default = () =>
       project using ReScript & TailwindCSS.`)}
     </P>
     <h2 className="text-2xl font-semibold mt-5"> {React.string("Quick Start")} </h2>
-    <div>
+    <div className="flex flex-col gap-5">
       <div>
-        {MoreReact.mapi(Expression.strings_of_table(Belnap.test_fn, 2, 1), (str, i) =>
-          <div className="font-mono"> {str->React.string} </div>
+        {MoreReact.map(Expression.strings_of_table(Expression.test_table), row =>
+          <div className="font-mono"> {row->React.string} </div>
         )}
+      </div>
+      <div>
+        {MoreReact.map(Expression.strings_of_table(Expression.test_falsy_table), row =>
+          <div className="font-mono"> {row->React.string} </div>
+        )}
+      </div>
+      <div>
+        {MoreReact.map(Expression.strings_of_table(Expression.test_truthy_table), row =>
+          <div className="font-mono"> {row->React.string} </div>
+        )}
+      </div>
+      <div className="font-mono">
+        {Expression.string_of_expression(Expression.test_exp)->React.string}
       </div>
     </div>
   </div>

@@ -25,6 +25,58 @@ var all_values = [
   "Top"
 ];
 
+function truthy_of_value(value) {
+  switch (value) {
+    case "Bottom" :
+        return [
+                "Bottom",
+                "Bottom"
+              ];
+    case "False" :
+        return [
+                "True",
+                "Bottom"
+              ];
+    case "True" :
+        return [
+                "Bottom",
+                "True"
+              ];
+    case "Top" :
+        return [
+                "True",
+                "True"
+              ];
+    
+  }
+}
+
+function falsy_of_value(value) {
+  switch (value) {
+    case "Bottom" :
+        return [
+                "Bottom",
+                "Bottom"
+              ];
+    case "False" :
+        return [
+                "False",
+                "Bottom"
+              ];
+    case "True" :
+        return [
+                "Bottom",
+                "False"
+              ];
+    case "Top" :
+        return [
+                "False",
+                "False"
+              ];
+    
+  }
+}
+
 function enumerate_inputs(m) {
   if (m === 0) {
     return [[]];
@@ -161,6 +213,8 @@ function test_fn(vs) {
 export {
   string_of_value ,
   all_values ,
+  truthy_of_value ,
+  falsy_of_value ,
   enumerate_inputs ,
   string_of_value_array ,
   and_fn ,

@@ -10,6 +10,22 @@ let string_of_value = value =>
 
 let all_values = [Bottom, False, True, Top]
 
+let truthy_of_value = value =>
+  switch value {
+  | Bottom => (Bottom, Bottom)
+  | False => (True, Bottom)
+  | True => (Bottom, True)
+  | Top => (True, True)
+  }
+
+let falsy_of_value = value =>
+  switch value {
+  | Bottom => (Bottom, Bottom)
+  | False => (False, Bottom)
+  | True => (Bottom, False)
+  | Top => (False, False)
+  }
+
 let rec enumerate_inputs = m =>
   switch m {
   | 0 => [[]]
