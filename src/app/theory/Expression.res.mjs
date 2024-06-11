@@ -6,22 +6,51 @@ import * as Belt_Array from "rescript/lib/es6/belt_Array.js";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
 
-function string_of_expression(exp) {
+function binop_of_exp(exp) {
   switch (exp.TAG) {
-    case "Variable" :
-        return "v" + exp._0.toString();
-    case "Constant" :
-        return Belnap.string_of_value(exp._0);
     case "And" :
-        return "(" + string_of_expression(exp._0) + " ∧ " + string_of_expression(exp._1) + ")";
+        return "AndOp";
     case "Or" :
-        return "(" + string_of_expression(exp._0) + " ∨ " + string_of_expression(exp._1) + ")";
+        return "OrOp";
     case "Join" :
-        return "(" + string_of_expression(exp._0) + " ⊔ " + string_of_expression(exp._1) + ")";
-    case "Not" :
-        return "¬" + string_of_expression(exp._0);
-    
+        return "JoinOp";
+    default:
+      return ;
   }
+}
+
+function string_of_expression(exp) {
+  var string_of_expression$p = function (parent, exp) {
+    var string;
+    switch (exp.TAG) {
+      case "Variable" :
+          string = "v" + exp._0.toString();
+          break;
+      case "Constant" :
+          string = Belnap.string_of_value(exp._0);
+          break;
+      case "And" :
+          string = string_of_expression$p("AndOp", exp._0) + " ∧ " + string_of_expression$p("AndOp", exp._1);
+          break;
+      case "Or" :
+          string = string_of_expression$p("OrOp", exp._0) + " ∨ " + string_of_expression$p("OrOp", exp._1);
+          break;
+      case "Join" :
+          string = string_of_expression$p("JoinOp", exp._0) + " ⊔ " + string_of_expression$p("JoinOp", exp._1);
+          break;
+      case "Not" :
+          string = "¬" + string_of_expression$p("NotOp", exp._0);
+          break;
+      
+    }
+    var match = binop_of_exp(exp);
+    if (parent !== undefined && match !== undefined && parent !== match) {
+      return "(" + string + ")";
+    } else {
+      return string;
+    }
+  };
+  return string_of_expression$p(undefined, exp);
 }
 
 function substitute(subs, exp) {
@@ -329,6 +358,7 @@ var test_falsy_table = match[1];
 var test_truthy_table = match[2];
 
 export {
+  binop_of_exp ,
   string_of_expression ,
   substitute ,
   rows_of_function ,

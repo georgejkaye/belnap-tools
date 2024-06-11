@@ -6,17 +6,43 @@ type rec expression =
   | Join(expression, expression)
   | Not(expression)
 
+type op = AndOp | OrOp | JoinOp | NotOp
+
+let binop_of_exp = exp =>
+  switch exp {
+  | And(_, _) => Some(AndOp)
+  | Or(_, _) => Some(OrOp)
+  | Join(_, _) => Some(JoinOp)
+  | _ => None
+  }
+
 let test_exp = And(Or(Variable(2), Constant(False)), Variable(1))
 
-let rec string_of_expression = exp =>
-  switch exp {
-  | Variable(i) => `v${Int.toString(i)}`
-  | Constant(v) => Belnap.string_of_value(v)
-  | And(e1, e2) => `(${string_of_expression(e1)} ∧ ${string_of_expression(e2)})`
-  | Or(e1, e2) => `(${string_of_expression(e1)} ∨ ${string_of_expression(e2)})`
-  | Join(e1, e2) => `(${string_of_expression(e1)} ⊔ ${string_of_expression(e2)})`
-  | Not(e) => `¬${string_of_expression(e)}`
+let string_of_expression = exp => {
+  let rec string_of_expression' = (parent, exp) => {
+    let string = switch exp {
+    | Variable(i) => `v${Int.toString(i)}`
+    | Constant(v) => Belnap.string_of_value(v)
+    | And(e1, e2) =>
+      `${string_of_expression'(Some(AndOp), e1)} ∧ ${string_of_expression'(Some(AndOp), e2)}`
+    | Or(e1, e2) =>
+      `${string_of_expression'(Some(OrOp), e1)} ∨ ${string_of_expression'(Some(OrOp), e2)}`
+    | Join(e1, e2) =>
+      `${string_of_expression'(Some(JoinOp), e1)} ⊔ ${string_of_expression'(Some(JoinOp), e2)}`
+    | Not(e) => `¬${string_of_expression'(Some(NotOp), e)}`
+    }
+    switch (parent, binop_of_exp(exp)) {
+    | (Some(parent_op), Some(exp_op)) =>
+      if parent_op == exp_op {
+        string
+      } else {
+        `(${string})`
+      }
+    | _ => string
+    }
   }
+  string_of_expression'(None, exp)
+}
 
 let rec substitute = (subs, exp) =>
   switch exp {
