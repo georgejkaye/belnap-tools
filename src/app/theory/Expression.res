@@ -102,7 +102,9 @@ let rec substitute = (subs, exp) =>
   | Not(e) => Not(substitute(subs, e))
   }
 
-let rows_of_function = (fn, m) => {
+type table = array<(array<Belnap.value>, array<Belnap.value>)>
+
+let table_of_function = (fn, m) => {
   let input_values = Belnap.enumerate_inputs(m)
   Array.reduce(input_values, [], (acc, vs) => {
     switch fn(vs) {
@@ -149,13 +151,13 @@ let string_of_row = ((inputs, outputs)) => {
 let string_of_table = rows => Utils.concatAsStrings(rows, ~delim="\n", string_of_row)
 let strings_of_table = rows => Array.map(rows, string_of_row)
 
-let string_of_function_table = (fn, m, n) => {
-  let rows = rows_of_function(fn, m)
+let string_of_function_table = (fn, m) => {
+  let rows = table_of_function(fn, m)
   string_of_table(rows)
 }
 
-let strings_of_function_table = (fn, m, n) => {
-  let rows = rows_of_function(fn, m)
+let strings_of_function_table = (fn, m) => {
+  let rows = table_of_function(fn, m)
   strings_of_table(rows)
 }
 
@@ -227,7 +229,7 @@ let get_subs = (left_translator, right_translator, m) =>
   )
 
 let expressions_of_function = (fn, m, n) => {
-  let table = rows_of_function(fn, m)
+  let table = table_of_function(fn, m)
   let falsy_table = falsy_explode_rows(table)
   let truthy_table = truthy_explode_rows(table)
   let falsy_subs = get_subs(

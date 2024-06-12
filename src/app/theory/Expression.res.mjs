@@ -393,7 +393,7 @@ function substitute(subs, exp) {
   }
 }
 
-function rows_of_function(fn, m) {
+function table_of_function(fn, m) {
   var input_values = Belnap.enumerate_inputs(m);
   return Core__Array.reduce(input_values, [], (function (acc, vs) {
                 var ws = fn(vs);
@@ -445,14 +445,6 @@ function explode_rows(exploder, left, rows) {
               }));
 }
 
-function truthy_explode_rows(extra) {
-  return explode_rows(Belnap.truthy_of_value, false, extra);
-}
-
-function falsy_explode_rows(extra) {
-  return explode_rows(Belnap.falsy_of_value, true, extra);
-}
-
 function string_of_row(param) {
   var string_of_cells = function (elements) {
     return Utils.concatAsStrings(elements, " ", Belnap.string_of_value);
@@ -470,14 +462,14 @@ function strings_of_table(rows) {
   return rows.map(string_of_row);
 }
 
-function string_of_function_table(fn, m, n) {
-  var rows = rows_of_function(fn, m);
+function string_of_function_table(fn, m) {
+  var rows = table_of_function(fn, m);
   return string_of_table(rows);
 }
 
-function strings_of_function_table(fn, m, n) {
-  var rows = rows_of_function(fn, m);
-  return rows.map(string_of_row);
+function strings_of_function_table(fn, m) {
+  var rows = table_of_function(fn, m);
+  return strings_of_table(rows);
 }
 
 function get_conj(col_unit, high_value, get_col_op, inputs) {
@@ -562,7 +554,7 @@ function get_subs(left_translator, right_translator, m) {
 }
 
 function expressions_of_function(fn, m, n) {
-  var table = rows_of_function(fn, m);
+  var table = table_of_function(fn, m);
   var falsy_table = explode_rows(Belnap.falsy_of_value, true, table);
   var truthy_table = explode_rows(Belnap.truthy_of_value, false, table);
   var falsy_subs = get_subs((function (i) {
