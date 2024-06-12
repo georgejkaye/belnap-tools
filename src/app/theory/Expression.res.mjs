@@ -634,9 +634,7 @@ var match = expressions_of_function((function (vs) {
         return [Belnap.not_fn(vs[0])];
       }), 1, 1);
 
-var test_exps = match[3];
-
-var test_exp = test_exps[0];
+var test_exp = match[3][0];
 
 var test_table = match[0];
 
@@ -645,29 +643,17 @@ var test_falsy_table = match[1];
 var test_truthy_table = match[2];
 
 export {
-  binop_of_exp ,
   string_of_expression ,
-  substitute ,
-  rows_of_function ,
-  explode_row ,
-  explode_rows ,
-  truthy_explode_rows ,
-  falsy_explode_rows ,
-  string_of_row ,
+  simplify ,
+  $$eval ,
+  table_of_function ,
   string_of_table ,
   strings_of_table ,
   string_of_function_table ,
   strings_of_function_table ,
-  get_conj ,
-  get_dnf ,
-  get_truthy_dnf ,
-  get_falsy_dnf ,
-  get_subs ,
-  expressions_of_function ,
   test_table ,
   test_falsy_table ,
   test_truthy_table ,
-  test_exps ,
   test_exp ,
 }
 /* match Not a pure module */
