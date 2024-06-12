@@ -29,21 +29,42 @@ function string_of_expression(exp) {
           string = Belnap.string_of_value(exp._0);
           break;
       case "And" :
-          string = string_of_expression$p("AndOp", exp._0) + " ∧ " + string_of_expression$p("AndOp", exp._1);
+          string = string_of_expression$p({
+                TAG: "BinOp",
+                _0: "AndOp"
+              }, exp._0) + " ∧ " + string_of_expression$p({
+                TAG: "BinOp",
+                _0: "AndOp"
+              }, exp._1);
           break;
       case "Or" :
-          string = string_of_expression$p("OrOp", exp._0) + " ∨ " + string_of_expression$p("OrOp", exp._1);
+          string = string_of_expression$p({
+                TAG: "BinOp",
+                _0: "OrOp"
+              }, exp._0) + " ∨ " + string_of_expression$p({
+                TAG: "BinOp",
+                _0: "OrOp"
+              }, exp._1);
           break;
       case "Join" :
-          string = string_of_expression$p("JoinOp", exp._0) + " ⊔ " + string_of_expression$p("JoinOp", exp._1);
+          string = string_of_expression$p({
+                TAG: "BinOp",
+                _0: "JoinOp"
+              }, exp._0) + " ⊔ " + string_of_expression$p({
+                TAG: "BinOp",
+                _0: "JoinOp"
+              }, exp._1);
           break;
       case "Not" :
-          string = "¬" + string_of_expression$p("NotOp", exp._0);
+          string = "¬" + string_of_expression$p({
+                TAG: "UnOp",
+                _0: "NotOp"
+              }, exp._0);
           break;
       
     }
     var match = binop_of_exp(exp);
-    if (parent !== undefined && match !== undefined && parent !== match) {
+    if (parent !== undefined && parent.TAG === "BinOp" && match !== undefined && parent._0 !== match) {
       return "(" + string + ")";
     } else {
       return string;

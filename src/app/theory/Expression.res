@@ -6,7 +6,9 @@ type rec expression =
   | Join(expression, expression)
   | Not(expression)
 
-type op = AndOp | OrOp | JoinOp | NotOp
+type binop = AndOp | OrOp | JoinOp
+type unop = NotOp
+type op = BinOp(binop) | UnOp(unop)
 
 let binop_of_exp = exp =>
   switch exp {
@@ -22,15 +24,24 @@ let string_of_expression = exp => {
     | Variable(i) => `v${Int.toString(i)}`
     | Constant(v) => Belnap.string_of_value(v)
     | And(e1, e2) =>
-      `${string_of_expression'(Some(AndOp), e1)} ∧ ${string_of_expression'(Some(AndOp), e2)}`
+      `${string_of_expression'(Some(BinOp(AndOp)), e1)} ∧ ${string_of_expression'(
+          Some(BinOp(AndOp)),
+          e2,
+        )}`
     | Or(e1, e2) =>
-      `${string_of_expression'(Some(OrOp), e1)} ∨ ${string_of_expression'(Some(OrOp), e2)}`
+      `${string_of_expression'(Some(BinOp(OrOp)), e1)} ∨ ${string_of_expression'(
+          Some(BinOp(OrOp)),
+          e2,
+        )}`
     | Join(e1, e2) =>
-      `${string_of_expression'(Some(JoinOp), e1)} ⊔ ${string_of_expression'(Some(JoinOp), e2)}`
-    | Not(e) => `¬${string_of_expression'(Some(NotOp), e)}`
+      `${string_of_expression'(Some(BinOp(JoinOp)), e1)} ⊔ ${string_of_expression'(
+          Some(BinOp(JoinOp)),
+          e2,
+        )}`
+    | Not(e) => `¬${string_of_expression'(Some(UnOp(NotOp)), e)}`
     }
     switch (parent, binop_of_exp(exp)) {
-    | (Some(parent_op), Some(exp_op)) =>
+    | (Some(BinOp(parent_op)), Some(exp_op)) =>
       if parent_op == exp_op {
         string
       } else {
@@ -189,6 +200,57 @@ let expressions_of_function = (fn, m, n) => {
     Join(falsy_exp, truthy_exp)
   })
   (table, falsy_table, truthy_table, expressions)
+}
+
+type token =
+  | TokenVariable(int)
+  | TokenOpenBracket
+  | TokenCloseBracket
+  | TokenConstant(Belnap.value)
+  | TokenBinaryOperator(binop)
+  | TokenUnaryOperator(unop)
+  | TokenOr
+  | TokenNot
+  | TokenJoin
+
+let tokens_of_string = input => {
+  let spaced = String.split(input, " ")
+  Array.reduce(spaced, Some([]), (acc, cur) =>
+    switch acc {
+    | None => None
+    | Some(acc) =>
+      let tok = switch cur {
+      | "&" => Some(TokenBinaryOperator(AndOp))
+      | "|" => Some(TokenBinaryOperator(OrOp))
+      | "¬" => Some(TokenUnaryOperator(NotOp))
+      | "_" => Some(TokenBinaryOperator(JoinOp))
+      | "n" => Some(TokenConstant(Belnap.Bottom))
+      | "t" => Some(TokenConstant(Belnap.True))
+      | "f" => Some(TokenConstant(Belnap.False))
+      | "b" => Some(TokenConstant(Belnap.Top))
+      | "(" => Some(TokenOpenBracket)
+      | ")" => Some(TokenCloseBracket)
+      | cs =>
+        switch String.get(cs, 0) {
+        | None => None
+        | Some("v") =>
+          switch String.get(cs, 1) {
+          | None => None
+          | Some(i) =>
+            switch Int.fromString(i) {
+            | None => None
+            | Some(i) => Some(TokenVariable(i))
+            }
+          }
+        | _ => None
+        }
+      }
+      switch tok {
+      | None => None
+      | Some(t) => Some([...acc, t])
+      }
+    }
+  )
 }
 
 let (
