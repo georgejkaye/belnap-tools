@@ -53,6 +53,301 @@ function string_of_expression(exp) {
   return string_of_expression$p(undefined, exp);
 }
 
+function simplify(_exp) {
+  while(true) {
+    var exp = _exp;
+    switch (exp.TAG) {
+      case "Variable" :
+          return {
+                  TAG: "Variable",
+                  _0: exp._0
+                };
+      case "Constant" :
+          return {
+                  TAG: "Constant",
+                  _0: exp._0
+                };
+      case "And" :
+          var a = exp._0;
+          var exit = 0;
+          var exit$1 = 0;
+          var exit$2 = 0;
+          var exit$3 = 0;
+          if (a.TAG === "Constant") {
+            if (a._0 === "False") {
+              return {
+                      TAG: "Constant",
+                      _0: "False"
+                    };
+            }
+            exit$3 = 5;
+          } else {
+            exit$3 = 5;
+          }
+          if (exit$3 === 5) {
+            var match = exp._1;
+            if (match.TAG === "Constant") {
+              if (match._0 === "False") {
+                return {
+                        TAG: "Constant",
+                        _0: "False"
+                      };
+              }
+              exit$2 = 4;
+            } else {
+              exit$2 = 4;
+            }
+          }
+          if (exit$2 === 4) {
+            if (a.TAG === "Constant") {
+              switch (a._0) {
+                case "True" :
+                    _exp = exp._1;
+                    continue ;
+                case "Bottom" :
+                case "Top" :
+                    exit$1 = 3;
+                    break;
+                
+              }
+            } else {
+              exit$1 = 3;
+            }
+          }
+          if (exit$1 === 3) {
+            var match$1 = exp._1;
+            if (match$1.TAG === "Constant") {
+              switch (match$1._0) {
+                case "True" :
+                    _exp = a;
+                    continue ;
+                case "Bottom" :
+                case "Top" :
+                    exit = 2;
+                    break;
+                
+              }
+            }
+            
+          }
+          if (exit === 2 && a.TAG === "Constant") {
+            return {
+                    TAG: "Constant",
+                    _0: Belnap.and_fn(a._0, exp._1._0)
+                  };
+          }
+          return {
+                  TAG: "And",
+                  _0: simplify(a),
+                  _1: simplify(exp._1)
+                };
+      case "Or" :
+          var a$1 = exp._0;
+          var exit$4 = 0;
+          var exit$5 = 0;
+          var exit$6 = 0;
+          var exit$7 = 0;
+          if (a$1.TAG === "Constant") {
+            if (a$1._0 === "True") {
+              return {
+                      TAG: "Constant",
+                      _0: "True"
+                    };
+            }
+            exit$7 = 5;
+          } else {
+            exit$7 = 5;
+          }
+          if (exit$7 === 5) {
+            var match$2 = exp._1;
+            if (match$2.TAG === "Constant") {
+              if (match$2._0 === "True") {
+                return {
+                        TAG: "Constant",
+                        _0: "True"
+                      };
+              }
+              exit$6 = 4;
+            } else {
+              exit$6 = 4;
+            }
+          }
+          if (exit$6 === 4) {
+            if (a$1.TAG === "Constant") {
+              switch (a$1._0) {
+                case "False" :
+                    _exp = exp._1;
+                    continue ;
+                case "Bottom" :
+                case "Top" :
+                    exit$5 = 3;
+                    break;
+                
+              }
+            } else {
+              exit$5 = 3;
+            }
+          }
+          if (exit$5 === 3) {
+            var match$3 = exp._1;
+            if (match$3.TAG === "Constant") {
+              switch (match$3._0) {
+                case "False" :
+                    _exp = a$1;
+                    continue ;
+                case "Bottom" :
+                case "Top" :
+                    exit$4 = 2;
+                    break;
+                
+              }
+            }
+            
+          }
+          if (exit$4 === 2 && a$1.TAG === "Constant") {
+            return {
+                    TAG: "Constant",
+                    _0: Belnap.or_fn(a$1._0, exp._1._0)
+                  };
+          }
+          return {
+                  TAG: "Or",
+                  _0: simplify(a$1),
+                  _1: simplify(exp._1)
+                };
+      case "Join" :
+          var a$2 = exp._0;
+          var exit$8 = 0;
+          if (a$2.TAG === "Constant") {
+            var a$3 = a$2._0;
+            var b = exp._1;
+            if (b.TAG === "Constant") {
+              return {
+                      TAG: "Constant",
+                      _0: Belnap.join_fn(a$3, b._0)
+                    };
+            }
+            switch (a$3) {
+              case "Bottom" :
+                  _exp = exp._1;
+                  continue ;
+              case "False" :
+              case "True" :
+                  break;
+              case "Top" :
+                  exit$8 = 2;
+                  break;
+              
+            }
+          } else {
+            var match$4 = exp._1;
+            if (match$4.TAG === "Constant") {
+              switch (match$4._0) {
+                case "Bottom" :
+                    _exp = a$2;
+                    continue ;
+                case "False" :
+                case "True" :
+                    exit$8 = 2;
+                    break;
+                case "Top" :
+                    return {
+                            TAG: "Constant",
+                            _0: "Top"
+                          };
+                
+              }
+            } else {
+              exit$8 = 2;
+            }
+          }
+          if (exit$8 === 2 && a$2.TAG === "Constant") {
+            return {
+                    TAG: "Constant",
+                    _0: "Top"
+                  };
+          }
+          return {
+                  TAG: "Join",
+                  _0: simplify(a$2),
+                  _1: simplify(exp._1)
+                };
+      case "Not" :
+          var a$4 = exp._0;
+          switch (a$4.TAG) {
+            case "Constant" :
+                return {
+                        TAG: "Constant",
+                        _0: Belnap.not_fn(a$4._0)
+                      };
+            case "And" :
+                return {
+                        TAG: "Or",
+                        _0: simplify({
+                              TAG: "Not",
+                              _0: a$4._0
+                            }),
+                        _1: simplify({
+                              TAG: "Not",
+                              _0: a$4._1
+                            })
+                      };
+            case "Or" :
+                return {
+                        TAG: "And",
+                        _0: simplify({
+                              TAG: "Not",
+                              _0: a$4._0
+                            }),
+                        _1: simplify({
+                              TAG: "Not",
+                              _0: a$4._1
+                            })
+                      };
+            case "Variable" :
+            case "Join" :
+                return {
+                        TAG: "Not",
+                        _0: simplify(a$4)
+                      };
+            case "Not" :
+                _exp = a$4._0;
+                continue ;
+            
+          }
+      
+    }
+  };
+}
+
+function $$eval(vars, exp) {
+  var eval$p = function (exp) {
+    switch (exp.TAG) {
+      case "Variable" :
+          var v = vars.get(exp._0);
+          if (v !== undefined) {
+            return v;
+          }
+          throw {
+                RE_EXN_ID: "Not_found",
+                Error: new Error()
+              };
+      case "Constant" :
+          return exp._0;
+      case "And" :
+          return Belnap.and_fn(eval$p(exp._0), eval$p(exp._1));
+      case "Or" :
+          return Belnap.or_fn(eval$p(exp._0), eval$p(exp._1));
+      case "Join" :
+          return Belnap.join_fn(eval$p(exp._0), eval$p(exp._1));
+      case "Not" :
+          return Belnap.not_fn(eval$p(exp._0));
+      
+    }
+  };
+  return eval$p(exp);
+}
+
 function substitute(subs, exp) {
   switch (exp.TAG) {
     case "Variable" :

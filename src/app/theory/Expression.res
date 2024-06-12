@@ -16,8 +16,6 @@ let binop_of_exp = exp =>
   | _ => None
   }
 
-let test_exp = And(Or(Variable(2), Constant(False)), Variable(1))
-
 let string_of_expression = exp => {
   let rec string_of_expression' = (parent, exp) => {
     let string = switch exp {
@@ -42,6 +40,52 @@ let string_of_expression = exp => {
     }
   }
   string_of_expression'(None, exp)
+}
+
+let rec simplify = exp =>
+  switch exp {
+  | Constant(v) => Constant(v)
+  | Variable(i) => Variable(i)
+  | And(Constant(False), _) => Constant(False)
+  | And(_, Constant(False)) => Constant(False)
+  | And(Constant(True), b) => simplify(b)
+  | And(a, Constant(True)) => simplify(a)
+  | And(Constant(a), Constant(b)) => Constant(Belnap.and_fn(a, b))
+  | And(a, b) => And(simplify(a), simplify(b))
+  | Or(Constant(True), _) => Constant(True)
+  | Or(_, Constant(True)) => Constant(True)
+  | Or(Constant(False), b) => simplify(b)
+  | Or(a, Constant(False)) => simplify(a)
+  | Or(Constant(a), Constant(b)) => Constant(Belnap.or_fn(a, b))
+  | Or(a, b) => Or(simplify(a), simplify(b))
+  | Not(Constant(a)) => Constant(Belnap.not_fn(a))
+  | Not(Not(a)) => simplify(a)
+  | Not(And(a, b)) => Or(simplify(Not(a)), simplify(Not(b)))
+  | Not(Or(a, b)) => And(simplify(Not(a)), simplify(Not(b)))
+  | Not(a) => Not(simplify(a))
+  | Join(Constant(a), Constant(b)) => Constant(Belnap.join_fn(a, b))
+  | Join(Constant(Bottom), b) => simplify(b)
+  | Join(a, Constant(Bottom)) => simplify(a)
+  | Join(Constant(Top), _) => Constant(Top)
+  | Join(_, Constant(Top)) => Constant(Top)
+  | Join(a, b) => Join(simplify(a), simplify(b))
+  }
+
+let eval = (vars, exp) => {
+  let rec eval' = exp =>
+    switch exp {
+    | Constant(v) => v
+    | Variable(i) =>
+      switch Map.get(vars, i) {
+      | None => raise(Not_found)
+      | Some(v) => v
+      }
+    | And(a, b) => Belnap.and_fn(eval'(a), eval'(b))
+    | Or(a, b) => Belnap.or_fn(eval'(a), eval'(b))
+    | Not(a) => Belnap.not_fn(eval'(a))
+    | Join(a, b) => Belnap.join_fn(eval'(a), eval'(b))
+    }
+  eval'(exp)
 }
 
 let rec substitute = (subs, exp) =>
