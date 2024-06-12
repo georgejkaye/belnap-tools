@@ -68,6 +68,18 @@ let not_fn = a =>
   | Top => Top
   }
 
+let join_fn = (a, b) =>
+  switch (a, b) {
+  | (Bottom, b) => b
+  | (a, Bottom) => a
+  | (Top, _) => Top
+  | (_, Top) => Top
+  | (True, True) => True
+  | (True, False) => Top
+  | (False, False) => False
+  | (False, True) => Top
+  }
+
 let test_fn = vs => {
   let x = vs[0]
   let y = vs[1]

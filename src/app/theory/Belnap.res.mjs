@@ -192,6 +192,49 @@ function not_fn(a) {
   }
 }
 
+function join_fn(a, b) {
+  switch (a) {
+    case "Bottom" :
+        return b;
+    case "False" :
+        switch (b) {
+          case "False" :
+              return "False";
+          case "True" :
+              return "Top";
+          case "Bottom" :
+          case "Top" :
+              break;
+          
+        }
+        break;
+    case "True" :
+        switch (b) {
+          case "False" :
+              return "Top";
+          case "True" :
+              return "True";
+          case "Bottom" :
+          case "Top" :
+              break;
+          
+        }
+        break;
+    case "Top" :
+        break;
+    
+  }
+  switch (b) {
+    case "Bottom" :
+        return a;
+    case "False" :
+    case "True" :
+    case "Top" :
+        return "Top";
+    
+  }
+}
+
 function test_fn(vs) {
   var x = vs[0];
   var y = vs[1];
@@ -220,6 +263,7 @@ export {
   and_fn ,
   or_fn ,
   not_fn ,
+  join_fn ,
   test_fn ,
 }
 /* No side effect */
