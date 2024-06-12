@@ -234,12 +234,12 @@ let expressions_of_function = (fn, m, n) => {
   let truthy_table = truthy_explode_rows(table)
   let falsy_subs = get_subs(
     i => And(Constant(Bottom), Variable(i)),
-    i => Not(Or(Constant(Bottom), Variable(i))),
+    i => Not(Or(Constant(Bottom), Variable(i - 1))),
     m,
   )
   let truthy_subs = get_subs(
     i => Not(And(Constant(Bottom), Variable(i))),
-    i => Or(Constant(Bottom), Variable(i)),
+    i => Or(Constant(Bottom), Variable(i - 1)),
     m,
   )
   let expressions = Array.fromInitializer(~length=n, i => {

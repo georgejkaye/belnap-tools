@@ -580,7 +580,7 @@ function expressions_of_function(fn, m, n) {
                     },
                     _1: {
                       TAG: "Variable",
-                      _0: i
+                      _0: i - 1 | 0
                     }
                   }
                 };
@@ -609,7 +609,7 @@ function expressions_of_function(fn, m, n) {
                   },
                   _1: {
                     TAG: "Variable",
-                    _0: i
+                    _0: i - 1 | 0
                   }
                 };
         }), m);
