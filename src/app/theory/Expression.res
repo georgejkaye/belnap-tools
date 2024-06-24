@@ -180,8 +180,8 @@ let get_subs = (left_translator, right_translator, m) =>
     }),
   )
 
-let expressions_of_function = (fn, m, n) => {
-  let table = Table.table_of_function(fn, m)
+let expressions_of_table = (table, m, n) => {
+  Console.log(Table.string_of_table(table))
   let falsy_table = Table.falsy_table_of_table(table)
   let truthy_table = Table.truthy_table_of_table(table)
   let falsy_subs = get_subs(
@@ -199,7 +199,13 @@ let expressions_of_function = (fn, m, n) => {
     let truthy_exp = substitute(truthy_subs, get_truthy_dnf(i, truthy_table))
     Join(falsy_exp, truthy_exp)
   })
-  (table, falsy_table, truthy_table, expressions)
+  (falsy_table, truthy_table, expressions)
+}
+
+let expressions_of_function = (fn, m, n) => {
+  let table = Table.table_of_function(fn, m)
+  let (falsy_table, truthy_table, expression) = expressions_of_table(table, m, n)
+  (table, falsy_table, truthy_table, expression)
 }
 
 type token =

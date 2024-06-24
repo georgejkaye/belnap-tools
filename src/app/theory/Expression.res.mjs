@@ -494,8 +494,8 @@ function get_subs(left_translator, right_translator, m) {
                   })));
 }
 
-function expressions_of_function(fn, m, n) {
-  var table = Table.table_of_function(fn, m);
+function expressions_of_table(table, m, n) {
+  console.log(Table.string_of_table(table));
   var falsy_table = Table.falsy_table_of_table(table);
   var truthy_table = Table.truthy_table_of_table(table);
   var falsy_subs = get_subs((function (i) {
@@ -564,10 +564,20 @@ function expressions_of_function(fn, m, n) {
                 };
         }));
   return [
-          table,
           falsy_table,
           truthy_table,
           expressions
+        ];
+}
+
+function expressions_of_function(fn, m, n) {
+  var table = Table.table_of_function(fn, m);
+  var match = expressions_of_table(table, m, n);
+  return [
+          table,
+          match[0],
+          match[1],
+          match[2]
         ];
 }
 
@@ -587,6 +597,8 @@ export {
   string_of_expression ,
   simplify ,
   $$eval ,
+  expressions_of_table ,
+  expressions_of_function ,
   test_table ,
   test_falsy_table ,
   test_truthy_table ,

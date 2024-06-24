@@ -8,6 +8,15 @@ let string_of_value = value =>
   | Top => "⊤"
   }
 
+let value_of_string = string =>
+  switch string {
+  | "⊥" => Some(Bottom)
+  | "f" => Some(False)
+  | "t" => Some(True)
+  | "⊤" => Some(Top)
+  | _ => None
+  }
+
 let all_values = [Bottom, False, True, Top]
 
 let truthy_of_value = value =>

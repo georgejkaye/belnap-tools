@@ -18,6 +18,21 @@ function string_of_value(value) {
   }
 }
 
+function value_of_string(string) {
+  switch (string) {
+    case "f" :
+        return "False";
+    case "t" :
+        return "True";
+    case "⊤" :
+        return "Top";
+    case "⊥" :
+        return "Bottom";
+    default:
+      return ;
+  }
+}
+
 var all_values = [
   "Bottom",
   "False",
@@ -255,6 +270,7 @@ function test_fn(vs) {
 
 export {
   string_of_value ,
+  value_of_string ,
   all_values ,
   truthy_of_value ,
   falsy_of_value ,
