@@ -46,7 +46,11 @@ module ValuePickerOption = {
 
 module ValuePicker = {
   let onChangeValue = (setValue, ev) => {
-    setValue(ReactEvent.Form.currentTarget(ev)["value"])
+    let valueString = ReactEvent.Form.currentTarget(ev)["value"]
+    switch (Belnap.value_of_string(valueString)) {
+      | None => ()
+      | Some(value) => setValue(value)
+    }
   }
   @react.component
   let make = (~value, ~setValue) => {

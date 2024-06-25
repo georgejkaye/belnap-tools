@@ -88,7 +88,12 @@ var ValuePickerOption = {
 };
 
 function onChangeValue$1(setValue, ev) {
-  return setValue(ev.currentTarget.value);
+  var valueString = ev.currentTarget.value;
+  var value = Belnap.value_of_string(valueString);
+  if (value !== undefined) {
+    return setValue(value);
+  }
+  
 }
 
 function TruthTable$ValuePicker(props) {
