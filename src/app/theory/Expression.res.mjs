@@ -64,8 +64,16 @@ function string_of_expression(exp) {
       
     }
     var match = binop_of_exp(exp);
-    if (parent !== undefined && parent.TAG === "BinOp" && match !== undefined && parent._0 !== match) {
-      return "(" + string + ")";
+    if (parent !== undefined) {
+      if (parent.TAG === "BinOp") {
+        if (match !== undefined && parent._0 !== match) {
+          return "(" + string + ")";
+        } else {
+          return string;
+        }
+      } else {
+        return " (" + string + ")";
+      }
     } else {
       return string;
     }
@@ -495,7 +503,6 @@ function get_subs(left_translator, right_translator, m) {
 }
 
 function expressions_of_table(table, m, n) {
-  console.log(Table.string_of_table(table));
   var falsy_table = Table.falsy_table_of_table(table);
   var truthy_table = Table.truthy_table_of_table(table);
   var falsy_subs = get_subs((function (i) {

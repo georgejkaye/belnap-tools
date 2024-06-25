@@ -47,6 +47,7 @@ let string_of_expression = exp => {
       } else {
         `(${string})`
       }
+    | (Some(UnOp(NotOp)), _) => ` (${string})`
     | _ => string
     }
   }
@@ -181,7 +182,6 @@ let get_subs = (left_translator, right_translator, m) =>
   )
 
 let expressions_of_table = (table, m, n) => {
-  Console.log(Table.string_of_table(table))
   let falsy_table = Table.falsy_table_of_table(table)
   let truthy_table = Table.truthy_table_of_table(table)
   let falsy_subs = get_subs(
@@ -206,57 +206,6 @@ let expressions_of_function = (fn, m, n) => {
   let table = Table.table_of_function(fn, m)
   let (falsy_table, truthy_table, expression) = expressions_of_table(table, m, n)
   (table, falsy_table, truthy_table, expression)
-}
-
-type token =
-  | TokenVariable(int)
-  | TokenOpenBracket
-  | TokenCloseBracket
-  | TokenConstant(Belnap.value)
-  | TokenBinaryOperator(binop)
-  | TokenUnaryOperator(unop)
-  | TokenOr
-  | TokenNot
-  | TokenJoin
-
-let tokens_of_string = input => {
-  let spaced = String.split(input, " ")
-  Array.reduce(spaced, Some([]), (acc, cur) =>
-    switch acc {
-    | None => None
-    | Some(acc) =>
-      let tok = switch cur {
-      | "&" => Some(TokenBinaryOperator(AndOp))
-      | "|" => Some(TokenBinaryOperator(OrOp))
-      | "¬" => Some(TokenUnaryOperator(NotOp))
-      | "_" => Some(TokenBinaryOperator(JoinOp))
-      | "n" => Some(TokenConstant(Belnap.Bottom))
-      | "t" => Some(TokenConstant(Belnap.True))
-      | "f" => Some(TokenConstant(Belnap.False))
-      | "b" => Some(TokenConstant(Belnap.Top))
-      | "(" => Some(TokenOpenBracket)
-      | ")" => Some(TokenCloseBracket)
-      | cs =>
-        switch String.get(cs, 0) {
-        | None => None
-        | Some("v") =>
-          switch String.get(cs, 1) {
-          | None => None
-          | Some(i) =>
-            switch Int.fromString(i) {
-            | None => None
-            | Some(i) => Some(TokenVariable(i))
-            }
-          }
-        | _ => None
-        }
-      }
-      switch tok {
-      | None => None
-      | Some(t) => Some([...acc, t])
-      }
-    }
-  )
 }
 
 let (
