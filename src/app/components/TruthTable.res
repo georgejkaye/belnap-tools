@@ -113,12 +113,15 @@ module TruthTableGrid = {
       !res || Array.includes(dict, inputs) ? (dict, false) : ([...dict, inputs], true)
     )->snd
   }
-  let onClickComputeExpression = (setExps, inputs, outputs, rows, _) => {
-    let (falsy_table, truthy_table, expressions) = Expression.expressions_of_table(
+  let onClickComputeExpression = (setExps, setFullTable, setFalsyTable, setTruthyTable, inputs, outputs, rows, _) => {
+    let (falsyTable, truthyTable, expressions) = Expression.expressions_of_table(
       rows,
       inputs,
       outputs,
     )
+    setFullTable(_ => Some(rows))
+    setFalsyTable(_ => Some(falsyTable))
+    setTruthyTable(_ => Some(truthyTable))
     setExps(_ => Some(expressions))
   }
   let updateRows = (rows, setRows, index, newRow) => {
@@ -129,6 +132,9 @@ module TruthTableGrid = {
   let make = (~inputs, ~outputs) => {
     let (rows, setRows) = React.useState(_ => [])
     let (exps, setExps) = React.useState(_ => None)
+    let (table, setTable) = React.useState(_ => None)
+    let (falsyTable, setFalsyTable) = React.useState(_ => None)
+    let (truthyTable, setTruthyTable) = React.useState(_ => None)
     React.useEffect(() => {
       setRows(_ => [])
       None
@@ -152,10 +158,20 @@ module TruthTableGrid = {
           ? React.string("")
           : <button
               className="p-2 border rounded-lg"
-              onClick={onClickComputeExpression(setExps, inputs, outputs, rows, ...)}>
+              onClick={onClickComputeExpression(setExps, setTable, setFalsyTable, setTruthyTable, inputs, outputs, rows, ...)}>
               {React.string("Compute expression")}
             </button>}
       </div>
+      {switch (table, falsyTable, truthyTable) {
+        | (Some(t), Some(ft), Some(tt)) => (
+          <div>
+          <div>{Table.string_of_table(t)->React.string}</div>
+          <div>{Table.string_of_table(ft)->React.string}</div>
+          <div>{Table.string_of_table(tt)->React.string}</div>
+          </div>
+        )
+        | _ => React.string("")
+      }}
       {switch exps {
       | None => React.string("")
       | Some(exps) =>
