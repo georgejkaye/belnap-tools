@@ -64,12 +64,7 @@ module ValuePicker = {
 
 module TruthTableRow = {
   let updateRowPortion = (rowPortion, index, value) => {
-    let newRowPortion = Array.copy(rowPortion)
-    switch Belnap.value_of_string(value) {
-    | Some(v) => newRowPortion[index] = v
-    | None => ()
-    }
-    newRowPortion
+    Array.mapWithIndex(rowPortion, (v, i) => i == index ? value : v)
   }
   let updateRow = (row, setRow, isInputs, index, value) => {
     let (inputs, outputs) = row

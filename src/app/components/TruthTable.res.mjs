@@ -122,12 +122,13 @@ var ValuePicker = {
 };
 
 function updateRowPortion(rowPortion, index, value) {
-  var newRowPortion = rowPortion.slice();
-  var v = Belnap.value_of_string(value);
-  if (v !== undefined) {
-    newRowPortion[index] = v;
-  }
-  return newRowPortion;
+  return rowPortion.map(function (v, i) {
+              if (i === index) {
+                return value;
+              } else {
+                return v;
+              }
+            });
 }
 
 function updateRow(row, setRow, isInputs, index, value) {
