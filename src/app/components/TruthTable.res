@@ -212,9 +212,9 @@ let make = () => {
     | _ => React.string("")
     }}
     <div>
-      {switch Expression.parse_expression("79") {
-      | None => React.string("")
-      | Some(i) => Int.toString(i)->React.string
+      {switch Expression.parseExpression("t") {
+      | None => React.string("Parse failed")
+      | Some(exp) => Expression.string_of_expression(exp)->React.string
       }}
     </div>
   </div>
