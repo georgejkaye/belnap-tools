@@ -2,6 +2,7 @@
 
 import * as Parjs from "../bindings/Parjs.res.mjs";
 import * as Table from "./Table.res.mjs";
+import * as Parjs$1 from "parjs";
 import * as Belnap from "./Belnap.res.mjs";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
@@ -589,15 +590,20 @@ function expressions_of_function(fn, m, n) {
         ];
 }
 
-exactly("&&");
-
-exactly("||");
-
-exactly("¬");
-
 var ExpressionParser = {};
 
 Parjs.Combinator(Parjs.IntParser, ExpressionParser);
+
+function parse_expression(str) {
+  var p = Parjs$1.int();
+  var res = p.parse(str);
+  console.log(res);
+  var match = res.kind;
+  if (match === "OK") {
+    return res.value;
+  }
+  
+}
 
 var match = expressions_of_function((function (vs) {
         return [Belnap.not_fn(vs[0])];
@@ -621,5 +627,6 @@ export {
   test_falsy_table ,
   test_truthy_table ,
   test_exp ,
+  parse_expression ,
 }
 /*  Not a pure module */

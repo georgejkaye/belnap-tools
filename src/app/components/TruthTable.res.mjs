@@ -374,6 +374,7 @@ function TruthTable(props) {
         return 0;
       });
   var outputs = match$1[0];
+  var i = Expression.parse_expression("79");
   return JsxRuntime.jsxs("div", {
               children: [
                 JsxRuntime.jsx(TruthTable$InputOutputSelector, {
@@ -385,7 +386,10 @@ function TruthTable(props) {
                 inputs !== undefined && outputs !== undefined ? JsxRuntime.jsx(TruthTable$TruthTableGrid, {
                         inputs: inputs,
                         outputs: outputs
-                      }) : ""
+                      }) : "",
+                JsxRuntime.jsx("div", {
+                      children: i !== undefined ? i.toString() : ""
+                    })
               ]
             });
 }

@@ -47,9 +47,9 @@ module ValuePickerOption = {
 module ValuePicker = {
   let onChangeValue = (setValue, ev) => {
     let valueString = ReactEvent.Form.currentTarget(ev)["value"]
-    switch (Belnap.value_of_string(valueString)) {
-      | None => ()
-      | Some(value) => setValue(value)
+    switch Belnap.value_of_string(valueString) {
+    | None => ()
+    | Some(value) => setValue(value)
     }
   }
   @react.component
@@ -113,7 +113,16 @@ module TruthTableGrid = {
       !res || Array.includes(dict, inputs) ? (dict, false) : ([...dict, inputs], true)
     )->snd
   }
-  let onClickComputeExpression = (setExps, setFullTable, setFalsyTable, setTruthyTable, inputs, outputs, rows, _) => {
+  let onClickComputeExpression = (
+    setExps,
+    setFullTable,
+    setFalsyTable,
+    setTruthyTable,
+    inputs,
+    outputs,
+    rows,
+    _,
+  ) => {
     let (falsyTable, truthyTable, expressions) = Expression.expressions_of_table(
       rows,
       inputs,
@@ -158,19 +167,28 @@ module TruthTableGrid = {
           ? React.string("")
           : <button
               className="p-2 border rounded-lg"
-              onClick={onClickComputeExpression(setExps, setTable, setFalsyTable, setTruthyTable, inputs, outputs, rows, ...)}>
+              onClick={onClickComputeExpression(
+                setExps,
+                setTable,
+                setFalsyTable,
+                setTruthyTable,
+                inputs,
+                outputs,
+                rows,
+                ...
+              )}>
               {React.string("Compute expression")}
             </button>}
       </div>
       {switch (table, falsyTable, truthyTable) {
-        | (Some(t), Some(ft), Some(tt)) => (
-          <div>
-          <div>{Table.string_of_table(t)->React.string}</div>
-          <div>{Table.string_of_table(ft)->React.string}</div>
-          <div>{Table.string_of_table(tt)->React.string}</div>
-          </div>
-        )
-        | _ => React.string("")
+      | (Some(t), Some(ft), Some(tt)) =>
+        <div>
+          <div> {Table.string_of_table(t)->React.string} </div>
+          <div> {Table.string_of_table(ft)->React.string} </div>
+          <div> {Table.string_of_table(tt)->React.string} </div>
+        </div>
+
+      | _ => React.string("")
       }}
       {switch exps {
       | None => React.string("")
@@ -193,5 +211,11 @@ let make = () => {
     | (Some(inputs), Some(outputs)) => <TruthTableGrid inputs outputs />
     | _ => React.string("")
     }}
+    <div>
+      {switch Expression.parse_expression("79") {
+      | None => React.string("")
+      | Some(i) => Int.toString(i)->React.string
+      }}
+    </div>
   </div>
 }

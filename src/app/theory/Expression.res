@@ -208,10 +208,6 @@ let expressions_of_function = (fn, m, n) => {
   (table, falsy_table, truthy_table, expression)
 }
 
-let parseAnd = Parjs.exactlyString("&&")
-let parseOr = Parjs.exactlyString("||")
-let parseNot = Parjs.exactlyString("¬")
-
 module ExpressionParser = {
   type t
   type res = expression
@@ -220,7 +216,13 @@ module ExpressionParser = {
 module IntToExpressionCombinator = Parjs.Combinator(Parjs.IntParser, ExpressionParser)
 
 let parse_expression = str => {
-  let p = Parjs.IntParser.int()
+  let p = Parjs.int()
+  let res = Parjs.IntMethods.parse(p, str)
+  Console.log(res)
+  switch Parjs.IntMethods.kind(res) {
+  | OK => Some(Parjs.IntMethods.value(res))
+  | _ => None
+  }
 }
 
 // let parse_expression = str => {
