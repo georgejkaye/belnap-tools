@@ -15,4 +15,4 @@ let test_falsy_table: Table.table
 let test_truthy_table: Table.table
 let test_exp: expression
 
-let parse_expression: string => option<int>
+let parseExpression: string => option<expression>

@@ -590,14 +590,46 @@ function expressions_of_function(fn, m, n) {
         ];
 }
 
-var ExpressionParser = {};
+var bottomParser = Parjs.map(Parjs$1.string("n"), (function (param) {
+        return "Bottom";
+      }));
 
-Parjs.Combinator(Parjs.IntParser, ExpressionParser);
+var trueParser = Parjs.map(Parjs$1.string("t"), (function (param) {
+        return "True";
+      }));
 
-function parse_expression(str) {
-  var p = Parjs$1.int();
-  var res = p.parse(str);
-  console.log(res);
+var falseParser = Parjs.map(Parjs$1.string("f"), (function (param) {
+        return "False";
+      }));
+
+var topParser = Parjs.map(Parjs$1.string("b"), (function (param) {
+        return "Top";
+      }));
+
+var valueParser = Parjs.map(Parjs.or(Parjs.or(Parjs.or(bottomParser, trueParser), falseParser), topParser), (function (v) {
+        return {
+                TAG: "Constant",
+                _0: v
+              };
+      }));
+
+var identifierParser = Parjs$1.string("v");
+
+var numberParser = Parjs$1.int({
+      allowSign: false
+    });
+
+var variableParser = Parjs.map(Parjs.then(identifierParser, numberParser), (function (param) {
+        return {
+                TAG: "Variable",
+                _0: param[1]
+              };
+      }));
+
+var expressionParser = Parjs.or(valueParser, variableParser);
+
+function parseExpression(str) {
+  var res = expressionParser.parse(str);
   var match = res.kind;
   if (match === "OK") {
     return res.value;
@@ -627,6 +659,6 @@ export {
   test_falsy_table ,
   test_truthy_table ,
   test_exp ,
-  parse_expression ,
+  parseExpression ,
 }
-/*  Not a pure module */
+/* bottomParser Not a pure module */

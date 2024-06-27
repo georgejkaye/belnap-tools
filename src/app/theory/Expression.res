@@ -208,19 +208,34 @@ let expressions_of_function = (fn, m, n) => {
   (table, falsy_table, truthy_table, expression)
 }
 
-module ExpressionParser = {
-  type t
-  type res = expression
+let valueParser = {
+  let bottomParser = Parjs.string("n")->Parjs.map(_ => Belnap.Bottom)
+  let trueParser = Parjs.string("t")->Parjs.map(_ => Belnap.True)
+  let falseParser = Parjs.string("f")->Parjs.map(_ => Belnap.False)
+  let topParser = Parjs.string("b")->Parjs.map(_ => Belnap.Top)
+  bottomParser
+  ->Parjs.or(trueParser)
+  ->Parjs.or(falseParser)
+  ->Parjs.or(topParser)
+  ->Parjs.map(v => Constant(v))
 }
 
-module IntToExpressionCombinator = Parjs.Combinator(Parjs.IntParser, ExpressionParser)
+let variableParser = {
+  let identifierParser = Parjs.string("v")
+  let numberParser = Parjs.int(~options={allowSign: false})
+  identifierParser
+  ->Parjs.then(numberParser)
+  ->Parjs.map(((_, i)) => Variable(i))
+}
 
-let parse_expression = str => {
-  let p = Parjs.int()
-  let res = Parjs.IntMethods.parse(p, str)
-  Console.log(res)
-  switch Parjs.IntMethods.kind(res) {
-  | OK => Some(Parjs.IntMethods.value(res))
+let expressionParser = {
+  valueParser->Parjs.or(variableParser)
+}
+
+let parseExpression = str => {
+  let res = Parjs.parse(expressionParser, str)
+  switch Parjs.kind(res) {
+  | OK => Some(Parjs.value(res))
   | _ => None
   }
 }
