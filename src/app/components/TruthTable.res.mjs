@@ -7,7 +7,6 @@ import * as Core__Int from "@rescript/core/src/Core__Int.res.mjs";
 import * as MoreReact from "../bindings/MoreReact.res.mjs";
 import * as Belt_Array from "rescript/lib/es6/belt_Array.js";
 import * as Expression from "../theory/Expression.res.mjs";
-import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as Core__Array from "@rescript/core/src/Core__Array.res.mjs";
 import * as JsxRuntime from "react/jsx-runtime";
 
@@ -375,7 +374,6 @@ function TruthTable(props) {
         return 0;
       });
   var outputs = match$1[0];
-  var exp = Expression.parseExpression("t");
   return JsxRuntime.jsxs("div", {
               children: [
                 JsxRuntime.jsx(TruthTable$InputOutputSelector, {
@@ -387,10 +385,7 @@ function TruthTable(props) {
                 inputs !== undefined && outputs !== undefined ? JsxRuntime.jsx(TruthTable$TruthTableGrid, {
                         inputs: inputs,
                         outputs: outputs
-                      }) : "",
-                JsxRuntime.jsx("div", {
-                      children: exp !== undefined ? Expression.string_of_expression(Caml_option.valFromOption(exp)) : "Parse failed"
-                    })
+                      }) : ""
               ]
             });
 }

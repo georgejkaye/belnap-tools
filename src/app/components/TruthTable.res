@@ -211,11 +211,5 @@ let make = () => {
     | (Some(inputs), Some(outputs)) => <TruthTableGrid inputs outputs />
     | _ => React.string("")
     }}
-    <div>
-      {switch Expression.parseExpression("t") {
-      | None => React.string("Parse failed")
-      | Some(exp) => Expression.string_of_expression(exp)->React.string
-      }}
-    </div>
   </div>
 }
