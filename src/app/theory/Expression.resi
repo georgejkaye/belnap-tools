@@ -15,4 +15,5 @@ let test_falsy_table: Table.table
 let test_truthy_table: Table.table
 let test_exp: expression
 
-let parseExpression: string => option<expression>
+type parsingResult = Succ(expression) | Fail(string)
+let parseExpression: string => parsingResult

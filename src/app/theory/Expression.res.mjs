@@ -73,8 +73,10 @@ function string_of_expression(exp) {
         } else {
           return string;
         }
+      } else if (match !== undefined) {
+        return "(" + string + ")";
       } else {
-        return " (" + string + ")";
+        return string;
       }
     } else {
       return string;
@@ -606,7 +608,7 @@ var topParser = Parjs.map(Parjs$1.string("b"), (function (param) {
         return "Top";
       }));
 
-var valueParser = Parjs.map(Parjs.or(Parjs.or(Parjs.or(bottomParser, trueParser), falseParser), topParser), (function (v) {
+var constantParser = Parjs.map(Parjs.or(Parjs.or(Parjs.or(bottomParser, trueParser), falseParser), topParser), (function (v) {
         return {
                 TAG: "Constant",
                 _0: v
@@ -626,15 +628,94 @@ var variableParser = Parjs.map(Parjs.then(identifierParser, numberParser), (func
               };
       }));
 
-var expressionParser = Parjs.or(valueParser, variableParser);
+var expressionParser = Parjs.later();
+
+var bracketedParser = Parjs.later();
+
+var notParser = Parjs.map(Parjs$1.string("¬"), (function (param) {
+        return "NotOp";
+      }));
+
+var valueParser = Parjs.or(constantParser, variableParser).expects("A value");
+
+var unopArgumentParser = Parjs.or(valueParser, bracketedParser);
+
+var unopParser = Parjs.map(Parjs.then(notParser, unopArgumentParser), (function (param) {
+          return {
+                  TAG: "Not",
+                  _0: param[1]
+                };
+        })).expects("An unary expression");
+
+var andParser = Parjs.map(Parjs$1.string("&&"), (function (param) {
+        return "AndOp";
+      }));
+
+var orParser = Parjs.map(Parjs$1.string("||"), (function (param) {
+        return "OrOp";
+      }));
+
+var joinParser = Parjs.map(Parjs$1.string("VV"), (function (param) {
+        return "JoinOp";
+      }));
+
+var spaceParser = Parjs$1.string(" ").expects("A space");
+
+var maybeSpaceParser = Parjs.maybe(spaceParser);
+
+var binopLhsParser = Parjs.or(Parjs.or(bracketedParser, valueParser), unopParser);
+
+var opParser = Parjs.or(Parjs.or(andParser, orParser), joinParser);
+
+var binopParser = Parjs.map(Parjs.then(Parjs.then(Parjs.then(Parjs.then(binopLhsParser, maybeSpaceParser), opParser), maybeSpaceParser), expressionParser), (function (param) {
+          var e2 = param[1];
+          var match = param[0][0];
+          var e1 = match[0][0];
+          switch (match[1]) {
+            case "AndOp" :
+                return {
+                        TAG: "And",
+                        _0: e1,
+                        _1: e2
+                      };
+            case "OrOp" :
+                return {
+                        TAG: "Or",
+                        _0: e1,
+                        _1: e2
+                      };
+            case "JoinOp" :
+                return {
+                        TAG: "Join",
+                        _0: e1,
+                        _1: e2
+                      };
+            
+          }
+        })).expects("A binary operation");
+
+var bracketedParser$p = Parjs.betweenStrings(expressionParser, "(", ")").expects("A bracketed expression");
+
+bracketedParser.init(bracketedParser$p);
+
+var expressionParser$p = Parjs.or(Parjs.recoverSoft(Parjs.or(Parjs.recoverSoft(Parjs.or(Parjs.recoverSoft(binopParser), unopParser)), valueParser)), bracketedParser).expects("An expression");
+
+expressionParser.init(expressionParser$p);
 
 function parseExpression(str) {
   var res = expressionParser.parse(str);
   var match = res.kind;
   if (match === "OK") {
-    return res.value;
+    return {
+            TAG: "Succ",
+            _0: res.value
+          };
   }
-  
+  console.log(res.toString());
+  return {
+          TAG: "Fail",
+          _0: res.reason
+        };
 }
 
 var match = expressions_of_function((function (vs) {

@@ -47,7 +47,7 @@ let string_of_expression = exp => {
       } else {
         `(${string})`
       }
-    | (Some(UnOp(NotOp)), _) => ` (${string})`
+    | (Some(UnOp(NotOp)), Some(_)) => `(${string})`
     | _ => string
     }
   }
@@ -208,7 +208,7 @@ let expressions_of_function = (fn, m, n) => {
   (table, falsy_table, truthy_table, expression)
 }
 
-let valueParser = {
+let constantParser = {
   let bottomParser = Parjs.string("n")->Parjs.map(_ => Belnap.Bottom)
   let trueParser = Parjs.string("t")->Parjs.map(_ => Belnap.True)
   let falseParser = Parjs.string("f")->Parjs.map(_ => Belnap.False)
@@ -228,24 +228,75 @@ let variableParser = {
   ->Parjs.map(((_, i)) => Variable(i))
 }
 
-let expressionParser = {
-  valueParser->Parjs.or(variableParser)
+let expressionParser = Parjs.later()
+let bracketedParser = Parjs.later()
+
+let notParser = Parjs.string("¬")->Parjs.map(_ => NotOp)
+
+let valueParser = constantParser->Parjs.or(variableParser)->Parjs.expects("A value")
+
+let unopArgumentParser = valueParser->Parjs.or(bracketedParser)
+
+let unopParser =
+  notParser
+  ->Parjs.then(unopArgumentParser)
+  ->Parjs.map(((_, exp)) => Not(exp))
+  ->Parjs.expects("An unary expression")
+
+let andParser = Parjs.string("&&")->Parjs.map(_ => AndOp)
+let orParser = Parjs.string("||")->Parjs.map(_ => OrOp)
+let joinParser = Parjs.string("VV")->Parjs.map(_ => JoinOp)
+
+let spaceParser = Parjs.string(" ")->Parjs.expects("A space")
+let maybeSpaceParser = spaceParser->Parjs.maybe
+
+let binopLhsParser = bracketedParser->Parjs.or(valueParser)->Parjs.or(unopParser)
+
+let binopParser = {
+  let opParser = andParser->Parjs.or(orParser)->Parjs.or(joinParser)
+  binopLhsParser
+  ->Parjs.then(maybeSpaceParser)
+  ->Parjs.then(opParser)
+  ->Parjs.then(maybeSpaceParser)
+  ->Parjs.then(expressionParser)
+  ->Parjs.map((((((e1, _), op), _), e2)) =>
+    switch op {
+    | AndOp => And(e1, e2)
+    | OrOp => Or(e1, e2)
+    | JoinOp => Join(e1, e2)
+    }
+  )
+  ->Parjs.expects("A binary operation")
 }
+
+let bracketedParser' =
+  expressionParser->Parjs.betweenStrings("(", ")")->Parjs.expects("A bracketed expression")
+Parjs.init(bracketedParser, bracketedParser')
+
+let expressionParser' = {
+  binopParser
+  ->Parjs.recoverSoft
+  ->Parjs.or(unopParser)
+  ->Parjs.recoverSoft
+  ->Parjs.or(valueParser)
+  ->Parjs.recoverSoft
+  ->Parjs.or(bracketedParser)
+  ->Parjs.expects("An expression")
+}
+
+Parjs.init(expressionParser, expressionParser')
+
+type parsingResult = Succ(expression) | Fail(string)
 
 let parseExpression = str => {
   let res = Parjs.parse(expressionParser, str)
   switch Parjs.kind(res) {
-  | OK => Some(Parjs.value(res))
-  | _ => None
+  | OK => Succ(Parjs.value(res))
+  | _ =>
+    Console.log(Parjs.toString(res))
+    Fail(Parjs.reason(res))
   }
 }
-
-// let parse_expression = str => {
-//   let ip = Parjs.int()
-//   let parser = Parjs.pipe(ip, ExpressionResultMethods.mapInt()
-//   ExpressionResultMethods.parse(
-//       Parjs.int().
-// }
 
 let (
   test_table,
