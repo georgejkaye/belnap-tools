@@ -54,6 +54,42 @@ let string_of_expression = exp => {
   string_of_expression'(None, exp)
 }
 
+let latex_of_expression = exp => {
+  let rec latex_of_expression' = (parent, exp) => {
+    let string = switch exp {
+    | Variable(i) => `v_{${Int.toString(i)}}`
+    | Constant(v) => Belnap.latex_of_value(v)
+    | And(e1, e2) =>
+      `${latex_of_expression'(Some(BinOp(AndOp)), e1)} \\wedge ${latex_of_expression'(
+          Some(BinOp(AndOp)),
+          e2,
+        )}`
+    | Or(e1, e2) =>
+      `${latex_of_expression'(Some(BinOp(OrOp)), e1)} \\vee ${latex_of_expression'(
+          Some(BinOp(OrOp)),
+          e2,
+        )}`
+    | Join(e1, e2) =>
+      `${latex_of_expression'(Some(BinOp(JoinOp)), e1)} \\sqcup ${latex_of_expression'(
+          Some(BinOp(JoinOp)),
+          e2,
+        )}`
+    | Not(e) => `\\neg ${latex_of_expression'(Some(UnOp(NotOp)), e)}`
+    }
+    switch (parent, binop_of_exp(exp)) {
+    | (Some(BinOp(parent_op)), Some(exp_op)) =>
+      if parent_op == exp_op {
+        string
+      } else {
+        `(${string})`
+      }
+    | (Some(UnOp(NotOp)), Some(_)) => `(${string})`
+    | _ => string
+    }
+  }
+  latex_of_expression'(None, exp)
+}
+
 let rec simplify = exp =>
   switch exp {
   | Constant(v) => Constant(v)

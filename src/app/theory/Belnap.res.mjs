@@ -18,6 +18,20 @@ function string_of_value(value) {
   }
 }
 
+function latex_of_value(value) {
+  switch (value) {
+    case "Bottom" :
+        return "\\bot";
+    case "False" :
+        return "\\mathsf{f}";
+    case "True" :
+        return "\\mathsf{t}";
+    case "Top" :
+        return "\\top";
+    
+  }
+}
+
 function value_of_string(string) {
   switch (string) {
     case "f" :
@@ -270,6 +284,7 @@ function test_fn(vs) {
 
 export {
   string_of_value ,
+  latex_of_value ,
   value_of_string ,
   all_values ,
   truthy_of_value ,

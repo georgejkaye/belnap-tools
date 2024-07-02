@@ -8,6 +8,14 @@ let string_of_value = value =>
   | Top => "⊤"
   }
 
+let latex_of_value = value =>
+  switch value {
+  | Bottom => "\\bot"
+  | False => "\\mathsf{f}"
+  | True => "\\mathsf{t}"
+  | Top => "\\top"
+  }
+
 let value_of_string = string =>
   switch string {
   | "⊥" => Some(Bottom)

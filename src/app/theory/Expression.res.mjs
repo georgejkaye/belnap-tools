@@ -85,6 +85,71 @@ function string_of_expression(exp) {
   return string_of_expression$p(undefined, exp);
 }
 
+function latex_of_expression(exp) {
+  var latex_of_expression$p = function (parent, exp) {
+    var string;
+    switch (exp.TAG) {
+      case "Variable" :
+          string = "v_{" + exp._0.toString() + "}";
+          break;
+      case "Constant" :
+          string = Belnap.latex_of_value(exp._0);
+          break;
+      case "And" :
+          string = latex_of_expression$p({
+                TAG: "BinOp",
+                _0: "AndOp"
+              }, exp._0) + " \\wedge " + latex_of_expression$p({
+                TAG: "BinOp",
+                _0: "AndOp"
+              }, exp._1);
+          break;
+      case "Or" :
+          string = latex_of_expression$p({
+                TAG: "BinOp",
+                _0: "OrOp"
+              }, exp._0) + " \\vee " + latex_of_expression$p({
+                TAG: "BinOp",
+                _0: "OrOp"
+              }, exp._1);
+          break;
+      case "Join" :
+          string = latex_of_expression$p({
+                TAG: "BinOp",
+                _0: "JoinOp"
+              }, exp._0) + " \\sqcup " + latex_of_expression$p({
+                TAG: "BinOp",
+                _0: "JoinOp"
+              }, exp._1);
+          break;
+      case "Not" :
+          string = "\\neg " + latex_of_expression$p({
+                TAG: "UnOp",
+                _0: "NotOp"
+              }, exp._0);
+          break;
+      
+    }
+    var match = binop_of_exp(exp);
+    if (parent !== undefined) {
+      if (parent.TAG === "BinOp") {
+        if (match !== undefined && parent._0 !== match) {
+          return "(" + string + ")";
+        } else {
+          return string;
+        }
+      } else if (match !== undefined) {
+        return "(" + string + ")";
+      } else {
+        return string;
+      }
+    } else {
+      return string;
+    }
+  };
+  return latex_of_expression$p(undefined, exp);
+}
+
 function simplify(_exp) {
   while(true) {
     var exp = _exp;
@@ -732,6 +797,7 @@ var test_truthy_table = match[2];
 
 export {
   string_of_expression ,
+  latex_of_expression ,
   simplify ,
   $$eval ,
   expressions_of_table ,

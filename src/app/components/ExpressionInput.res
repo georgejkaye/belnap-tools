@@ -84,7 +84,11 @@ module CheatSheet = {
 module ExpressionDisplay = {
   @react.component
   let make = (~expression) => {
-    <div> {Expression.string_of_expression(expression)->React.string} </div>
+    <div className="p-4 bg-green-800 text-yellow-300 rounded-lg">
+      <Mathjax>
+        {Expression.latex_of_expression(expression)->Mathjax.inline->React.string}
+      </Mathjax>
+    </div>
   }
 }
 
