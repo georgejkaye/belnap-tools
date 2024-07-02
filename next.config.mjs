@@ -1,4 +1,4 @@
-import bsconfig from "./rescript.json" assert { type: "json" }
+import bsconfig from "./rescript.json" with { type: "json" }
 
 const transpileModules = ["rescript"].concat(bsconfig["bs-dependencies"])
 
@@ -6,6 +6,7 @@ import nextTranspileModules from "next-transpile-modules"
 const withTM = nextTranspileModules(transpileModules)
 
 const config = {
+  output: "standalone",
   pageExtensions: ["jsx", "js"],
   env: {
     ENV: process.env.NODE_ENV,

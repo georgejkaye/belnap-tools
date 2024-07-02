@@ -2,20 +2,24 @@
   "name": "belnap-tools",
   "version": "0.1.0",
   "license": "GPL-3.0-or-later",
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
+    "next:dev": "next dev",
+    "next:build": "next build",
+    "next:start": "next start",
+    "next:lint": "next lint",
     "res:build": "rescript",
     "res:clean": "rescript clean",
-    "res:dev": "rescript -w"
+    "res:dev": "rescript -w",
+    "dev": "npm-run-all --parallel \"next:dev -p {1}\" res:dev --",
+    "build": "npm-run-all res:build next:build"
   },
   "dependencies": {
     "@rescript/core": "1.4.0",
     "@rescript/react": "^0.12.2",
     "autoprefixer": "^10.4.19",
     "better-react-mathjax": "^2.0.3",
+    "cssnano": "^7.0.3",
     "next": "14.2.3",
     "next-transpile-modules": "^10.0.1",
     "parjs": "^1.3.4",
@@ -26,6 +30,7 @@
   "devDependencies": {
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
+    "npm-run-all": "^4.1.5",
     "postcss": "^8",
     "reanalyze": "^2.23.0",
     "tailwindcss": "^3.4.1"
