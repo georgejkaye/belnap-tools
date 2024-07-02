@@ -5,7 +5,7 @@ module InputSelector = {
   let make = (~specType, ~setSpecType) => {
     let buttonStyle = "py-2 px-2 border rounded-lg"
     let inactiveButtonStyle = ""
-    let activeButtonStyle = "bg-blue-200"
+    let activeButtonStyle = "bg-accent text-white font-bold"
     let (expressionButtonStyle, truthTableButtonStyle) = switch specType {
     | TruthTable => (inactiveButtonStyle, activeButtonStyle)
     | Expression => (activeButtonStyle, inactiveButtonStyle)

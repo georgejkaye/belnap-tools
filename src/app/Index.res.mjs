@@ -9,7 +9,7 @@ function Index$InputSelector(props) {
   var setSpecType = props.setSpecType;
   var buttonStyle = "py-2 px-2 border rounded-lg";
   var inactiveButtonStyle = "";
-  var activeButtonStyle = "bg-blue-200";
+  var activeButtonStyle = "bg-accent text-white font-bold";
   var match;
   match = props.specType === "TruthTable" ? [
       inactiveButtonStyle,

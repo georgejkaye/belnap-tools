@@ -7,7 +7,11 @@ export default {
     "./src/app/**/*.{js,mjs}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        accent: "#000b9e",
+      },
+    },
   },
   plugins: [],
 }
