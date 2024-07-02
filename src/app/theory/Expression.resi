@@ -1,6 +1,11 @@
 type expression
 let string_of_expression: expression => string
 let latex_of_expression: expression => string
+
+let functionOfExpression: expression => array<Belnap.value> => Belnap.value
+
+let highestVariable: expression => int
+
 let simplify: expression => expression
 let eval: (Js.Map.t<int, Belnap.value>, expression) => Belnap.value
 

@@ -90,6 +90,32 @@ let latex_of_expression = exp => {
   latex_of_expression'(None, exp)
 }
 
+let rec functionOfExpression = exp => inputs => {
+  switch exp {
+  | Variable(i) => Array.getUnsafe(inputs, i)
+  | Constant(v) => v
+  | And(e1, e2) => Belnap.and_fn(functionOfExpression(e1)(inputs), functionOfExpression(e2)(inputs))
+  | Or(e1, e2) => Belnap.or_fn(functionOfExpression(e1)(inputs), functionOfExpression(e2)(inputs))
+  | Join(e1, e2) =>
+    Belnap.join_fn(functionOfExpression(e1)(inputs), functionOfExpression(e2)(inputs))
+  | Not(e1) => Belnap.not_fn(functionOfExpression(e1)(inputs))
+  }
+}
+
+let highestVariable = exp => {
+  let rec highestVariable' = (highest, exp) => {
+    switch exp {
+    | Variable(i) => Js.Math.max_int(i, highest)
+    | Constant(_) => highest
+    | And(e1, e2) => highestVariable'(highestVariable'(highest, e1), e2)
+    | Or(e1, e2) => highestVariable'(highestVariable'(highest, e1), e2)
+    | Join(e1, e2) => highestVariable'(highestVariable'(highest, e1), e2)
+    | Not(e1) => highestVariable'(highest, e1)
+    }
+  }
+  highestVariable'(-1, exp)
+}
+
 let rec simplify = exp =>
   switch exp {
   | Constant(v) => Constant(v)

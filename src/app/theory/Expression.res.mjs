@@ -150,6 +150,49 @@ function latex_of_expression(exp) {
   return latex_of_expression$p(undefined, exp);
 }
 
+function functionOfExpression(exp) {
+  return function (inputs) {
+    switch (exp.TAG) {
+      case "Variable" :
+          return inputs[exp._0];
+      case "Constant" :
+          return exp._0;
+      case "And" :
+          return Belnap.and_fn(functionOfExpression(exp._0)(inputs), functionOfExpression(exp._1)(inputs));
+      case "Or" :
+          return Belnap.or_fn(functionOfExpression(exp._0)(inputs), functionOfExpression(exp._1)(inputs));
+      case "Join" :
+          return Belnap.join_fn(functionOfExpression(exp._0)(inputs), functionOfExpression(exp._1)(inputs));
+      case "Not" :
+          return Belnap.not_fn(functionOfExpression(exp._0)(inputs));
+      
+    }
+  };
+}
+
+function highestVariable(exp) {
+  var highestVariable$p = function (_highest, _exp) {
+    while(true) {
+      var exp = _exp;
+      var highest = _highest;
+      switch (exp.TAG) {
+        case "Variable" :
+            return Math.max(exp._0, highest);
+        case "Constant" :
+            return highest;
+        case "Not" :
+            _exp = exp._0;
+            continue ;
+        default:
+          _exp = exp._1;
+          _highest = highestVariable$p(highest, exp._0);
+          continue ;
+      }
+    };
+  };
+  return highestVariable$p(-1, exp);
+}
+
 function simplify(_exp) {
   while(true) {
     var exp = _exp;
@@ -798,6 +841,8 @@ var test_truthy_table = match[2];
 export {
   string_of_expression ,
   latex_of_expression ,
+  functionOfExpression ,
+  highestVariable ,
   simplify ,
   $$eval ,
   expressions_of_table ,
