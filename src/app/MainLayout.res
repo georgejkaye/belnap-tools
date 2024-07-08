@@ -1,5 +1,3 @@
-module Link = Next.Link
-
 module TopBar = {
   @react.component
   let make = () =>
@@ -15,9 +13,7 @@ let make = (~children) => {
   <div style=minWidth className="flex flex-col items-center">
     <TopBar />
     <div className="max-w-5xl w-full lg:w-3/4 text-gray-900 font-base align-center">
-      <main className="mt-4 mx-4">
-        <Mathjax.Context> {children} </Mathjax.Context>
-      </main>
+      <main className="mt-4 mx-4"> {children} </main>
     </div>
   </div>
 }

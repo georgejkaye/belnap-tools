@@ -145,3 +145,5 @@ module Dynamic = {
 
   @val external import_: string => Js.Promise.t<'a> = "import"
 }
+
+type metadata = {title: string}

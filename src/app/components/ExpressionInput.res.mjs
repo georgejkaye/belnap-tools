@@ -7,6 +7,7 @@ import * as MoreReact from "../bindings/MoreReact.res.mjs";
 import * as Expression from "../theory/Expression.res.mjs";
 import * as Caml_option from "rescript/lib/es6/caml_option.js";
 import * as JsxRuntime from "react/jsx-runtime";
+import * as BetterReactMathjax from "better-react-mathjax";
 
 function ExpressionInput$InputBox(props) {
   var setExpression = props.setExpression;
@@ -180,10 +181,12 @@ var CheatSheet = {
 
 function ExpressionInput$ExpressionDisplay(props) {
   return JsxRuntime.jsx("div", {
-              children: JsxRuntime.jsx(Mathjax.make, {
-                    children: Mathjax.inline(Expression.latex_of_expression(props.expression)),
-                    inline: true,
-                    dynamic: true
+              children: JsxRuntime.jsx(BetterReactMathjax.MathJaxContext, {
+                    children: JsxRuntime.jsx(Mathjax.make, {
+                          children: Mathjax.inline(Expression.latex_of_expression(props.expression)),
+                          inline: true,
+                          dynamic: true
+                        })
                   }),
               className: "p-4 bg-green-800 text-yellow-300 rounded-lg"
             });

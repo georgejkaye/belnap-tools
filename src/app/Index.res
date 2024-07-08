@@ -1,3 +1,5 @@
+@@directive("'use client';")
+
 type specificationType = TruthTable | Expression
 
 module InputSelector = {
@@ -29,7 +31,8 @@ module InputSelector = {
   }
 }
 
-let default = () => {
+@react.component
+let make = () => {
   let (specType, setSpecType) = React.useState(_ => Expression)
   <div className="flex flex-col gap-4">
     <div>
