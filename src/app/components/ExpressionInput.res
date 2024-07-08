@@ -85,7 +85,7 @@ module ExpressionDisplay = {
   @react.component
   let make = (~expression) => {
     <div className="p-4 bg-green-800 text-yellow-300 rounded-lg">
-      <Mathjax>
+      <Mathjax inline={true} dynamic={true}>
         {Expression.latex_of_expression(expression)->Mathjax.inline->React.string}
       </Mathjax>
     </div>

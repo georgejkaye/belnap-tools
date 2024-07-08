@@ -181,7 +181,9 @@ var CheatSheet = {
 function ExpressionInput$ExpressionDisplay(props) {
   return JsxRuntime.jsx("div", {
               children: JsxRuntime.jsx(Mathjax.make, {
-                    children: Mathjax.inline(Expression.latex_of_expression(props.expression))
+                    children: Mathjax.inline(Expression.latex_of_expression(props.expression)),
+                    inline: true,
+                    dynamic: true
                   }),
               className: "p-4 bg-green-800 text-yellow-300 rounded-lg"
             });

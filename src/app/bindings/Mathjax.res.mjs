@@ -16,8 +16,14 @@ function display(str) {
 }
 
 function Mathjax(props) {
+  var __dynamic = props.dynamic;
+  var __inline = props.inline;
+  var inline = __inline !== undefined ? __inline : false;
+  var dynamic = __dynamic !== undefined ? __dynamic : false;
   return JsxRuntime.jsx(BetterReactMathjax.MathJax, {
-              children: props.children
+              children: props.children,
+              inline: inline,
+              dynamic: dynamic
             });
 }
 
