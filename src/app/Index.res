@@ -32,6 +32,11 @@ module InputSelector = {
 let default = () => {
   let (specType, setSpecType) = React.useState(_ => Expression)
   <div className="flex flex-col gap-4">
+    <div>
+      {React.string(
+        "This is a tool for experimenting with the four-valued Belnap system of logic. To get started, choose a way of specifying a function in Belnap logic below.",
+      )}
+    </div>
     <InputSelector specType setSpecType />
     {switch specType {
     | TruthTable => <TruthTable />

@@ -352,7 +352,7 @@ function TruthTable$TruthTableGrid(props) {
                                     }, i.toString());
                         })) : ""
               ],
-              className: "flex flex-col items-start gap-4 py-4"
+              className: "flex flex-col items-start gap-4"
             });
 }
 
@@ -376,6 +376,9 @@ function TruthTable(props) {
   var outputs = match$1[0];
   return JsxRuntime.jsxs("div", {
               children: [
+                JsxRuntime.jsx("div", {
+                      children: "Define a truth table below to compute its logical expression."
+                    }),
                 JsxRuntime.jsx(TruthTable$InputOutputSelector, {
                       inputs: inputs,
                       setInputs: match[1],
@@ -386,7 +389,8 @@ function TruthTable(props) {
                         inputs: inputs,
                         outputs: outputs
                       }) : ""
-              ]
+              ],
+              className: "flex flex-col gap-4"
             });
 }
 

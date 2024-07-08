@@ -119,6 +119,7 @@ module TableDisplay = {
 let make = () => {
   let (expression, setExpression) = React.useState(_ => None)
   <div className="flex flex-col gap-4">
+    <div> {React.string("Type in a string below to generate its truth table.")} </div>
     <InputBox expression setExpression />
     <CheatSheet />
     {switch expression {

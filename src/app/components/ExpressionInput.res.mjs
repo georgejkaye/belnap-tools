@@ -251,6 +251,9 @@ function ExpressionInput(props) {
   }
   return JsxRuntime.jsxs("div", {
               children: [
+                JsxRuntime.jsx("div", {
+                      children: "Type in a string below to generate its truth table."
+                    }),
                 JsxRuntime.jsx(ExpressionInput$InputBox, {
                       expression: expression,
                       setExpression: match[1]

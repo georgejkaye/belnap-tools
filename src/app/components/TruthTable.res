@@ -148,7 +148,7 @@ module TruthTableGrid = {
       setRows(_ => [])
       None
     }, [inputs, outputs])
-    <div className="flex flex-col items-start gap-4 py-4">
+    <div className="flex flex-col items-start gap-4">
       {Array.length(rows) == 0
         ? React.string("")
         : <div>
@@ -205,7 +205,8 @@ module TruthTableGrid = {
 let make = () => {
   let (inputs, setInputs) = React.useState(_ => Some(0))
   let (outputs, setOutputs) = React.useState(_ => Some(0))
-  <div>
+  <div className="flex flex-col gap-4">
+    <div> {React.string("Define a truth table below to compute its logical expression.")} </div>
     <InputOutputSelector inputs setInputs outputs setOutputs />
     {switch (inputs, outputs) {
     | (Some(inputs), Some(outputs)) => <TruthTableGrid inputs outputs />

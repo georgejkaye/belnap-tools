@@ -66,6 +66,9 @@ function $$default() {
   tmp = specType === "TruthTable" ? JsxRuntime.jsx(TruthTable.make, {}) : JsxRuntime.jsx(ExpressionInput.make, {});
   return JsxRuntime.jsxs("div", {
               children: [
+                JsxRuntime.jsx("div", {
+                      children: "This is a tool for experimenting with the four-valued Belnap system of logic. To get started, choose a way of specifying a function in Belnap logic below."
+                    }),
                 JsxRuntime.jsx(Index$InputSelector, {
                       specType: specType,
                       setSpecType: match[1]
