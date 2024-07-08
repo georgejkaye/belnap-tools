@@ -9,7 +9,7 @@ COPY ./yarn.lock .
 COPY ./next.config.mjs .
 COPY ./tailwind.config.js .
 COPY ./postcss.config.mjs .
-COPY ./public/static .
+#COPY ./public/static .
 COPY ./rescript.json .
 COPY ./jsconfig.json .
 
