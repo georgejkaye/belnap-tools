@@ -626,7 +626,7 @@ function expressions_of_table(table, m, n) {
                   },
                   _1: {
                     TAG: "Variable",
-                    _0: i
+                    _0: i / 2 | 0
                   }
                 };
         }), (function (i) {
@@ -640,7 +640,7 @@ function expressions_of_table(table, m, n) {
                     },
                     _1: {
                       TAG: "Variable",
-                      _0: i - 1 | 0
+                      _0: i / 2 | 0
                     }
                   }
                 };
@@ -656,7 +656,7 @@ function expressions_of_table(table, m, n) {
                     },
                     _1: {
                       TAG: "Variable",
-                      _0: i
+                      _0: i / 2 | 0
                     }
                   }
                 };
@@ -669,7 +669,7 @@ function expressions_of_table(table, m, n) {
                   },
                   _1: {
                     TAG: "Variable",
-                    _0: i - 1 | 0
+                    _0: i / 2 | 0
                   }
                 };
         }), m);

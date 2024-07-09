@@ -247,13 +247,13 @@ let expressions_of_table = (table, m, n) => {
   let falsy_table = Table.falsy_table_of_table(table)
   let truthy_table = Table.truthy_table_of_table(table)
   let falsy_subs = get_subs(
-    i => And(Constant(Bottom), Variable(i)),
-    i => Not(Or(Constant(Bottom), Variable(i - 1))),
+    i => And(Constant(Bottom), Variable(i / 2)),
+    i => Not(Or(Constant(Bottom), Variable(i / 2))),
     m,
   )
   let truthy_subs = get_subs(
-    i => Not(And(Constant(Bottom), Variable(i))),
-    i => Or(Constant(Bottom), Variable(i - 1)),
+    i => Not(And(Constant(Bottom), Variable(i / 2))),
+    i => Or(Constant(Bottom), Variable(i / 2)),
     m,
   )
   let expressions = Array.fromInitializer(~length=n, i => {
