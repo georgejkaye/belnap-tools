@@ -140,13 +140,14 @@ function updateRowPortion(rowPortion, index, value) {
 }
 
 function updateRow(row, setRow, isInputs, index, value) {
+  var outputs = row[1];
   var inputs = row[0];
   var match = isInputs ? [
       updateRowPortion(inputs, index, value),
-      row[1]
+      outputs
     ] : [
       inputs,
-      updateRowPortion(inputs, index, value)
+      updateRowPortion(outputs, index, value)
     ];
   return setRow([
               match[0],

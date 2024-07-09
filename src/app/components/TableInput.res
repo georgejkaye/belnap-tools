@@ -74,7 +74,7 @@ module TruthTableRow = {
     let (inputs, outputs) = row
     let (newInputs, newOutputs) = isInputs
       ? (updateRowPortion(inputs, index, value), outputs)
-      : (inputs, updateRowPortion(inputs, index, value))
+      : (inputs, updateRowPortion(outputs, index, value))
     setRow((newInputs, newOutputs))
   }
   @react.component
