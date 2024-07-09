@@ -9,4 +9,5 @@ services:
       - "${CLIENT_PORT}:${CLIENT_PORT}"
     volumes:
       - ./src:/app/src
+      - ./lib:/app/lib
     tty: true
