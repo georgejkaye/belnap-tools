@@ -818,12 +818,12 @@ function parseExpression(str) {
             TAG: "Succ",
             _0: res.value
           };
+  } else {
+    return {
+            TAG: "Fail",
+            _0: res.reason
+          };
   }
-  console.log(res.toString());
-  return {
-          TAG: "Fail",
-          _0: res.reason
-        };
 }
 
 var match = expressions_of_function((function (vs) {

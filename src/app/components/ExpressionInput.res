@@ -1,15 +1,15 @@
 module InputBox = {
   @react.component
-  let make = (~expression, ~setExpression) => {
+  let make = (~setExpression) => {
     let (expressionText, setExpressionText) = React.useState(_ => "")
     let onChangeExpressionInput = e => {
       setExpressionText(JsxEvent.Form.target(e)["value"])
     }
-    let parseExpression = e => {
+    let parseExpression = _ => {
       let expression = Expression.parseExpression(expressionText)
       switch expression {
       | Succ(exp) => setExpression(_ => Some(exp))
-      | Fail(msg) => ()
+      | Fail(_) => ()
       }
     }
     let onKeyDownExpressionInput = e => {
@@ -94,42 +94,22 @@ module ExpressionDisplay = {
   }
 }
 
-module TableDisplay = {
-  @react.component
-  let make = (~expression) => {
-    let numberOfInputs = Expression.highestVariable(expression) + 1
-    let inputSignals = Belnap.enumerate_inputs(numberOfInputs)
-    let expressionFunction = Expression.functionOfExpression(expression)
-    <div className="flex flex-row">
-      <div className="border-r pr-4 flex flex-col gap-2">
-        {MoreReact.map(inputSignals, signal => {
-          <div className="font-mono"> {Belnap.string_of_value_array(signal)->React.string} </div>
-        })}
-      </div>
-      <div className="px-4 flex flex-col gap-2">
-        {MoreReact.map(inputSignals, signal => {
-          <div className="font-mono">
-            {Belnap.string_of_value(expressionFunction(signal))->React.string}
-          </div>
-        })}
-      </div>
-    </div>
-  }
-}
-
 @react.component
 let make = () => {
   let (expression, setExpression) = React.useState(_ => None)
   <div className="flex flex-col gap-4">
     <div> {React.string("Type in a string below to generate its truth table.")} </div>
-    <InputBox expression setExpression />
+    <InputBox setExpression />
     <CheatSheet />
     {switch expression {
     | None => React.string("")
     | Some(expression) =>
+      let valueFunction = Expression.functionOfExpression(expression)
+      let function = vs => [valueFunction(vs)]
+      let inputs = Expression.highestVariable(expression) + 1
       <div className="flex flex-col gap-4">
         <ExpressionDisplay expression />
-        <TableDisplay expression />
+        <TruthTable.FromFunction inputs function />
       </div>
     }}
   </div>

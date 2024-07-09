@@ -354,9 +354,7 @@ let parseExpression = str => {
   let res = Parjs.parse(expressionParser, str)
   switch Parjs.kind(res) {
   | OK => Succ(Parjs.value(res))
-  | _ =>
-    Console.log(Parjs.toString(res))
-    Fail(Parjs.reason(res))
+  | _ => Fail(Parjs.reason(res))
   }
 }
 

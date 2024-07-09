@@ -42,7 +42,7 @@ let make = () => {
     </div>
     <InputSelector specType setSpecType />
     {switch specType {
-    | TruthTable => <TruthTable />
+    | TruthTable => <TableInput />
     | Expression => <ExpressionInput />
     }}
   </div>
