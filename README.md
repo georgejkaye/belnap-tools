@@ -1,6 +1,7 @@
 # belnap-tools
 
-This is a web app for experimenting with Belnap logic.
+This is a web app for experimenting with Belnap logic. as detailed in [my thesis](https://arxiv.org/abs/2502.08497).
+See it live at [belnap.georgejkaye.com](https://belnap.georgejkaye.com).
 
 ## Development
 
