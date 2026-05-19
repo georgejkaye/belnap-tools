@@ -13,10 +13,15 @@ COPY package.json yarn.lock ./
 RUN yarn --frozen-lockfile
 
 # Rebuild source only when needed
-FROM base as builder
+FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY src src
+COPY package.json .
+COPY rescript.json .
+COPY postcss.config.mjs .
+COPY tailwind.config.js .
+COPY next.config.mjs .
 
 RUN yarn build
 
