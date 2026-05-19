@@ -16,7 +16,7 @@ You can then use the tools at `localhost:3000`.
 To configure the port used, you can set the CLIENT_PORT variable in a `.env` file.
 
 ```sh
-# env
+# .env
 CLIENT_PORT=3001
 ```
 
@@ -38,14 +38,12 @@ configure the port used.
 
 ### Manually
 
-Run the Rescript watcher to generate JavaScript output from the Rescript files:
+Install dependencies with your preferred Node package manager,
+and then start the ReScript watcher to generate JavaScript output from
+the ReScript files, and Next.JS watcher to serve the generated JavaScript
+to `localhost:3000`:
 
 ```sh
-yarn res:dev
-```
-
-In another terminal, run the Next.JS watcher to serve the generated JavaScript to `localhost:3000`:
-
-```sh
+yarn
 yarn dev
 ```
