@@ -4,6 +4,6 @@ services:
       context: .
       dockerfile: Dockerfile.prod
       args:
-        CLIENT_PORT: ${CLIENT_PORT}
+        CLIENT_PORT: 3000
     ports:
-      - "${CLIENT_PORT}:${CLIENT_PORT}"
+      - "${CLIENT_PORT:-3000}:3000"

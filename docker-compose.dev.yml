@@ -4,9 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile.dev
       args:
-        CLIENT_PORT: ${CLIENT_PORT:3000}
+        CLIENT_PORT: 3000
     ports:
-      - "${CLIENT_PORT:3000}:${CLIENT_PORT:3000}"
+      - "${CLIENT_PORT:-3000}:3000"
     volumes:
       - ./src:/app/src
       - ./lib:/app/lib
